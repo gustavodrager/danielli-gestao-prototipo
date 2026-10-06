@@ -1,12 +1,46 @@
-import{NavLink,Route,Routes,useNavigate}from'react-router-dom';
-const money=(n:number)=>n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-const unidades=[['Amarela',82400,'44,7%','yellow'],['Azul',54700,'29,7%','blue'],['Verde',31200,'16,9%','green'],['Vermelha',16020,'8,7%','red']] as const;
-function Shell({children}:{children:React.ReactNode}){return <main className="app">{children}<nav><NavLink to="/">Início</NavLink><NavLink to="/caixa">Caixa</NavLink><NavLink to="/mais">Mais</NavLink></nav></main>}
-function Dashboard(){const go=useNavigate();return <Shell><header><div><b>DANIELLI</b><small>Gestão gerencial</small></div><button className="ghost">2 alertas</button></header><section className="period"><div><small>VISÃO GERAL</small><h1>Este mês</h1></div><span>Atualizado hoje</span></section><button className="hero" onClick={()=>go('/indicadores/faturamento')}><small>FATURAMENTO</small><strong>{money(184320)}</strong><span className="positive">↑ 8,4% vs mês anterior</span><em>Média/dia {money(6144)}</em></button><div className="grid"><button className="card" onClick={()=>go('/indicadores/cmv')}><small>CMV</small><strong>32,4%</strong><span>{money(59710)}</span><em className="warning">↑ 1,2 p.p.</em></button><button className="card"><small>DESPESAS</small><strong>{money(28450)}</strong><span>Pessoal {money(41200)}</span></button></div><button className="result" onClick={()=>go('/indicadores/resultado')}><small>RESULTADO GERENCIAL</small><strong>{money(54960)}</strong><span>29,8% do faturamento</span></button><section className="card"><div className="row"><b>Evolução</b><small>Últimos 6 meses</small></div><div className="bars">{[42,63,52,78,68,90].map((h,i)=><i key={i} style={{height:h}}/>)}</div></section><section className="card"><div className="row"><b>Unidades de negócio</b><small>por comandas</small></div>{unidades.map(([n,v,p,c])=><div className="unit" key={n}><i className={c}/><span>{n}</span><b>{money(v)}</b><small>{p}</small></div>)}</section><button className="card wide" onClick={()=>go('/caixa')}><div className="row"><b>Caixa hoje</b><span>Ver fechamento ›</span></div><strong>{money(6840)}</strong><em className="warning">Diferença - R$ 32,00</em></button><section className="attention"><b>Atenção</b><span>CMV acima da média</span><span>3 diferenças de caixa nos últimos 7 dias</span></section></Shell>}
-function Indicador({tipo}:{tipo:string}){const go=useNavigate();let title=tipo==='cmv'?'CMV':tipo==='resultado'?'Resultado gerencial':'Faturamento';return <Shell><button className="back" onClick={()=>go(-1)}>‹ Visão geral</button><h1>{title}</h1><section className="hero static"><small>ESTE MÊS</small><strong>{tipo==='cmv'?'32,4%':tipo==='resultado'?money(54960):money(184320)}</strong><span>Comparativo com mês anterior</span></section><h2>Composição</h2>{['Carnes','Buffet','Massas','Outros'].map((x,i)=><button className="list" key={x}><span>{x}</span><b>{money([18430,16210,9840,15230][i])}</b><span>›</span></button>)}</Shell>}
-function Caixa(){const go=useNavigate();return <Shell><header><div><b>Caixa</b><small>Fechamento diário</small></div></header><section className="hero static"><small>HOJE</small><strong>{money(6840)}</strong><span>Fechamento ainda não realizado</span></section><button className="primary" onClick={()=>go('/caixa/novo')}>Iniciar fechamento</button><h2>Últimos fechamentos</h2>{['04/10','03/10','02/10'].map((d,i)=><div className="list" key={d}><span>{d}</span><b>{money([7110,6520,6980][i])}</b><small className={i===1?'warning':'positive'}>{i===1?'- R$ 18':'Conferido'}</small></div>)}</Shell>}
-const formas=['Dinheiro','Pix','Débito','Crédito','Voucher','iFood'];
-function NovoCaixa(){const go=useNavigate();return <Shell><button className="back" onClick={()=>go(-1)}>‹ Caixa</button><small>FECHAMENTO · 05 OUT 2026</small><h1>Recebimentos</h1><p>Informe os valores registrados no fechamento.</p>{formas.map((f,i)=><label className="input" key={f}><span>{f}</span><input inputMode="decimal" placeholder="R$ 0,00" defaultValue={i===0?'1420,00':''}/></label>)}<div className="total"><span>Total informado</span><b>R$ 1.420,00</b></div><button className="primary" onClick={()=>go('/caixa/novo/unidades')}>Continuar</button></Shell>}
-function Unidades(){const go=useNavigate();return <Shell><button className="back" onClick={()=>go(-1)}>‹ Recebimentos</button><small>FECHAMENTO · ETAPA 2</small><h1>Unidades de negócio</h1><p>Informe o faturamento identificado pelas cores das comandas.</p>{unidades.map(([n,,,c])=><label className="input" key={n}><span><i className={'dot '+c}/>{n}</span><input inputMode="decimal" placeholder="R$ 0,00"/></label>)}<button className="primary" onClick={()=>go('/caixa/novo/conferencia')}>Conferir fechamento</button></Shell>}
-function Conferencia(){return <Shell><button className="back">‹ Unidades</button><small>FECHAMENTO · CONFERÊNCIA</small><h1>Conferência</h1><section className="card summary"><div><span>Total de vendas</span><b>{money(8870)}</b></div><div><span>Total registrado</span><b>{money(8870)}</b></div></section><section className="success"><small>DIFERENÇA</small><strong>R$ 0,00</strong><span>Caixa conferido</span></section><button className="primary">Confirmar fechamento</button></Shell>}
-export default function App(){return <Routes><Route path="/" element={<Dashboard/>}/><Route path="/indicadores/faturamento" element={<Indicador tipo="fat"/>}/><Route path="/indicadores/cmv" element={<Indicador tipo="cmv"/>}/><Route path="/indicadores/resultado" element={<Indicador tipo="resultado"/>}/><Route path="/caixa" element={<Caixa/>}/><Route path="/caixa/novo" element={<NovoCaixa/>}/><Route path="/caixa/novo/unidades" element={<Unidades/>}/><Route path="/caixa/novo/conferencia" element={<Conferencia/>}/><Route path="/mais" element={<Shell><h1>Mais</h1><p>Áreas futuras serão adicionadas gradualmente.</p></Shell>}/></Routes>}
+import { Route, Routes } from "react-router-dom";
+import { DemoProvider } from "./demo-context";
+import { Shell, Back } from "./ui";
+import Dashboard from "./Dashboard";
+import { Indicator, EntryDetail } from "./Indicator";
+import { Cash, CashFlow, CashHistory, CashSuccess } from "./Cash";
+import More from "./More";
+export default function App() {
+  return (
+    <DemoProvider>
+      <Shell>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/indicadores/:tipo" element={<Indicator />} />
+          <Route path="/indicadores/:tipo/:grupo" element={<Indicator />} />
+          <Route
+            path="/indicadores/:tipo/:grupo/origens/:origem"
+            element={<Indicator />}
+          />
+          <Route path="/lancamentos/:id" element={<EntryDetail />} />
+          <Route path="/caixa" element={<Cash />} />
+          <Route path="/caixa/novo" element={<CashFlow step={1} />} />
+          <Route path="/caixa/novo/unidades" element={<CashFlow step={2} />} />
+          <Route path="/caixa/novo/saidas" element={<CashFlow step={3} />} />
+          <Route
+            path="/caixa/novo/conferencia"
+            element={<CashFlow step={4} />}
+          />
+          <Route path="/caixa/concluido" element={<CashSuccess />} />
+          <Route path="/caixa/historico/:id" element={<CashHistory />} />
+          <Route path="/mais" element={<More />} />
+          <Route
+            path="*"
+            element={
+              <>
+                <Back to="/">Visão geral</Back>
+                <h1>Página não encontrada</h1>
+                <p>Continue pela visão geral ou pelo Caixa.</p>
+              </>
+            }
+          />
+        </Routes>
+      </Shell>
+    </DemoProvider>
+  );
+}
