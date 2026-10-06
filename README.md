@@ -4,7 +4,7 @@ Protótipo mobile-first do Restaurante e Doceria Danielli. As unidades atuais s�
 
 ## Experiência disponível
 
-- Dashboard com período selecionável, comparação histórica, média por dia calendário, despesas, pessoal, mix por unidade, resultado e Prime Cost.
+- Dashboard com período selecionável, comparação histórica, média por dia calendário, despesas, pessoal, mix por unidade, resultado e CMV + Pessoal.
 - Drill-down: resumo → composição → categoria/unidade → fornecedor/origem → lançamento → documento demonstrativo.
 - Caixa em quatro etapas: recebimentos e responsáveis → unidades de negócio → saídas e observações → conferência.
 - Totais derivados dos campos digitados, validação de valores, retorno para edição, rascunho e conclusão **apenas na sessão atual**.
@@ -16,7 +16,7 @@ Protótipo mobile-first do Restaurante e Doceria Danielli. As unidades atuais s�
 
 As seis unidades foram confirmadas pelo usuário. A relação de cada unidade com uma cor de comanda ainda precisa ser confirmada; o protótipo não atribui cores. Não há rateio de despesas/CMV por unidade.
 
-Compras ilustram a aproximação do CMV. Sem estoques inicial/final, **CMV, resultado e Prime Cost são estimados**. O resultado demonstrativo usa faturamento − compras − despesas gerais − pessoal. O Prime Cost demonstrativo usa (compras + pessoal) / faturamento. Validar cobertura e metodologia com Higor antes de usar dados reais.
+Compras ilustram a aproximação do CMV. Sem estoques inicial/final, **CMV, resultado e CMV + Pessoal são estimados**. O resultado demonstrativo usa faturamento − compras − despesas gerais − pessoal. O CMV + Pessoal demonstrativo usa (compras + pessoal) / faturamento. Validar cobertura e metodologia com Higor antes de usar dados reais.
 
 A diferença do caixa é **demonstrativa: soma dos recebimentos − vendas informadas**. Saídas ficam visíveis separadamente, sem abatimento automático. A fórmula oficial, os conceitos de total registrado/vendas e o tratamento das saídas precisam ser confirmados. Diferenças e falta de distribuição por unidade não criam bloqueios operacionais fictícios. Campos obrigatórios são validações da demonstração.
 
@@ -36,7 +36,7 @@ Sem backend, upload, integração ou gravação permanente. Recarregar a página
 | Responsáveis, saídas e conclusão ausentes        | Fluxo completo de demonstração com retorno e sucesso                                      |
 | Estimativas apresentadas como reais              | Sinalização observado/calculado/estimado e explicação das fórmulas                        |
 | Poucos estados e narrativa de apresentação       | Três cenários, estados vazios/erro e roteiro em Mais                                      |
-| Acabamento genérico                              | Paleta creme/verde/dourado, hierarquia, foco visível, áreas de toque e navegação inferior |
+| Acabamento genérico                              | Paleta creme/amarelo/dourado, hierarquia, foco visível, áreas de toque e navegação inferior |
 
 ## Executar e validar
 
@@ -65,7 +65,7 @@ Se necessário, informe `AGENT_BROWSER_BIN` com o caminho do executável. `BASE_
 
 1. Correspondência entre cada unidade confirmada e a cor da comanda.
 2. Categorias atuais de compras, despesas e composição de pessoal, evitando duplicidade de despesas.
-3. Metodologia do CMV, resultado gerencial e Prime Cost; cobertura das fontes históricas.
+3. Metodologia do CMV, resultado gerencial e CMV + Pessoal; cobertura das fontes históricas.
 4. Fórmula da diferença, vendas, recebimentos, saídas e eventuais saldos de caixa.
 5. Responsáveis, conferente, data e registros do fechamento atual.
 6. Documentos reais para importação e rastreabilidade, sem mudar os processos existentes.

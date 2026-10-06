@@ -5,17 +5,17 @@
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-  color: #263c35;
+  color: #3c3526;
   background: #ecebe3;
   font-synthesis: none;
   font-weight: 400;
   line-height: 1.5;
-  --ink: #243f34;
-  --muted: #666c63;
+  --ink: #3d3020;
+  --muted: #716450;
   --gold: #b5914d;
-  --paper: #f8f7f1;
-  --line: #e4e5db;
-  --green: #294d3d;
+  --paper: #fcf9ef;
+  --line: #e5ddce;
+  --accent: #e9bd43;
 }
 * {
   box-sizing: border-box;
@@ -75,7 +75,7 @@ h1 em,
 .welcome em {
   font-family: Georgia, serif;
   font-weight: 400;
-  color: #6d7c62;
+  color: #7c7362;
 }
 h2 {
   font-size: 17px;
@@ -114,7 +114,7 @@ textarea:focus-visible {
   margin: 0 auto;
   background: var(--paper);
   padding: 25px 24px calc(102px + env(safe-area-inset-bottom));
-  box-shadow: 0 0 90px #263c350d;
+  box-shadow: 0 0 90px #3c35260d;
 }
 .brand-header {
   display: flex;
@@ -161,10 +161,10 @@ textarea:focus-visible {
   font-weight: 700;
   letter-spacing: 0.7px;
   padding: 8px 9px;
-  border: 1px solid #d8dece;
+  border: 1px solid #ded7c8;
   border-radius: 99px;
-  background: #eef1e7;
-  color: #52644a;
+  background: #f1e9d9;
+  color: #645b4a;
   white-space: nowrap;
   min-height: 36px;
   display: flex;
@@ -175,7 +175,7 @@ textarea:focus-visible {
   font-weight: 700;
   letter-spacing: 1.4px;
   display: block;
-  color: #59664f;
+  color: #665e4f;
 }
 .welcome {
   margin-bottom: 24px;
@@ -198,7 +198,7 @@ textarea:focus-visible {
   margin-bottom: 7px;
 }
 .period-select select {
-  border: 1px solid #d8decf;
+  border: 1px solid #ded7c8;
   background: #fffef9;
   color: var(--ink);
   border-radius: 12px;
@@ -217,7 +217,7 @@ textarea:focus-visible {
   color: var(--muted);
 }
 .period-caption a {
-  color: #516546;
+  color: #655b46;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -231,16 +231,16 @@ textarea:focus-visible {
   border-radius: 23px;
   padding: 23px;
   background:
-    radial-gradient(ellipse at top right, #4d6451 0, transparent 64%), #263f34;
+    radial-gradient(ellipse at top right, #645c4d 0, transparent 64%), #3f3726;
   color: #fff;
   position: relative;
   overflow: hidden;
   margin: 0 0 14px;
   display: block;
-  box-shadow: 0 8px 24px #243f3410;
+  box-shadow: 0 8px 24px #3f362410;
 }
 .hero .eyebrow {
-  color: #d1d9c7;
+  color: #d9d2c3;
 }
 .hero-value {
   display: block;
@@ -250,12 +250,12 @@ textarea:focus-visible {
   margin: 14px 0 16px;
 }
 .hero .growth {
-  color: #dce8c0;
+  color: #e8dbc0;
   font-size: 12px;
 }
 .hero .badge {
   background: #ffffff14;
-  color: #e0e5d8;
+  color: #e5ddce;
   border-color: #ffffff26;
 }
 .hero-bottom {
@@ -267,7 +267,7 @@ textarea:focus-visible {
   justify-content: space-between;
   gap: 12px;
   font-size: 10px;
-  color: #c8d1c2;
+  color: #d1cabc;
 }
 .hero-bottom b {
   display: block;
@@ -323,7 +323,7 @@ textarea:focus-visible {
   gap: 5px;
   margin-top: auto;
   padding-top: 10px;
-  color: #536849;
+  color: #685e49;
   border-top: 1px solid var(--line);
 }
 .metric-link {
@@ -334,10 +334,10 @@ textarea:focus-visible {
 .result {
   display: grid;
   gap: 10px;
-  border: 1px solid #d6dcc8;
+  border: 1px solid #dcd5c6;
   border-radius: 19px;
   padding: 20px;
-  background: #e8eddf;
+  background: #ede5d5;
   margin-bottom: 15px;
 }
 .result strong {
@@ -346,7 +346,7 @@ textarea:focus-visible {
 }
 .result > span {
   font-size: 11px;
-  color: #59664f;
+  color: #665e4f;
 }
 .badge {
   font-size: 9px;
@@ -355,7 +355,7 @@ textarea:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  border: 1px solid #dbe2d3;
+  border: 1px solid #e2dacb;
   padding: 3px 7px;
   border-radius: 5px;
   line-height: 1.4;
@@ -363,8 +363,8 @@ textarea:focus-visible {
   width: fit-content;
 }
 .badge.calculado {
-  color: #4e6553;
-  background: #f0f4ea;
+  color: #655d4e;
+  background: #f4ecdc;
 }
 .badge.observado {
   color: #476b7a;
@@ -384,7 +384,7 @@ textarea:focus-visible {
   align-items: center;
   gap: 10px;
   padding: 15px 0;
-  border-bottom: 1px solid #eceee4;
+  border-bottom: 1px solid #eee6d6;
   min-height: 62px;
 }
 .row-link:last-child {
@@ -411,7 +411,7 @@ textarea:focus-visible {
   white-space: nowrap;
 }
 .row-link > svg {
-  color: #91a08c;
+  color: #a0998c;
 }
 .unit-dot {
   display: inline-block;
@@ -421,10 +421,10 @@ textarea:focus-visible {
   flex: 0 0 10px;
 }
 .note {
-  border-left: 3px solid #bfcbb1;
+  border-left: 3px solid #cbc2b1;
   border-radius: 0 10px 10px 0;
-  background: #edf0e7;
-  color: #56634b;
+  background: #f0e8d8;
+  color: #635b4b;
   padding: 13px 15px;
   font-size: 12px;
   line-height: 1.65;
@@ -441,9 +441,9 @@ textarea:focus-visible {
   color: #795f2f;
 }
 .note.success {
-  background: #eaf2e8;
-  border-color: #81a577;
-  color: #3d633e;
+  background: #f2eada;
+  border-color: #a59677;
+  color: #63563d;
 }
 .note a {
   text-decoration: underline;
@@ -462,7 +462,7 @@ textarea:focus-visible {
   letter-spacing: 1px;
 }
 .text-link {
-  color: #5d7352;
+  color: #736852;
   background: transparent;
   font-size: 11px;
   font-weight: 650;
@@ -485,7 +485,7 @@ textarea:focus-visible {
   flex: 1;
   min-width: 0;
   text-align: center;
-  color: #65705e;
+  color: #706a5e;
   font-size: 10px;
   display: flex;
   flex-direction: column;
@@ -504,11 +504,11 @@ textarea:focus-visible {
 .chart-bar {
   width: 100%;
   max-width: 40px;
-  background: #bec9af;
+  background: #c9c0af;
   border-radius: 5px 5px 2px 2px;
 }
 .selected .chart-bar {
-  background: #496047;
+  background: #605847;
 }
 .selected {
   font-weight: 700;
@@ -517,14 +517,14 @@ textarea:focus-visible {
   width: 100%;
   max-width: 40px;
   height: 10px;
-  border: 1px dashed #bbc6b0;
+  border: 1px dashed #c6bfb0;
   border-radius: 4px;
 }
 .chart-note {
   font-size: 10px;
   line-height: 1.6;
   margin: 15px 0 0;
-  color: #6a7463;
+  color: #746e63;
 }
 .mix-bar {
   height: 9px;
@@ -554,17 +554,17 @@ textarea:focus-visible {
   min-height: 50px;
 }
 .primary {
-  background: var(--green);
+  background: var(--accent);
   color: #fff;
 }
 .primary.gold {
   background: #dfc586;
-  color: #263d31;
+  color: #3d3526;
 }
 .secondary {
   background: #fffdf6;
-  border: 1px solid #d5ddca;
-  color: #47613d;
+  border: 1px solid #ddd6c7;
+  color: #61553d;
 }
 .flow-actions {
   margin-top: 25px;
@@ -574,7 +574,7 @@ textarea:focus-visible {
   display: block;
   text-align: center;
   padding: 16px;
-  color: #62705b;
+  color: #70695b;
   text-decoration: underline;
   text-underline-offset: 4px;
 }
@@ -599,12 +599,12 @@ textarea:focus-visible {
 }
 .demo-story a {
   font-size: 11px;
-  color: #52643f;
+  color: #64583f;
   font-weight: 600;
 }
 .page-footer {
   text-align: center;
-  color: #636e58;
+  color: #6e6758;
   font-size: 10px;
   line-height: 1.9;
   padding: 22px 0 0;
@@ -620,9 +620,9 @@ textarea:focus-visible {
   padding: 9px 12px;
   background: #fffffff5;
   backdrop-filter: blur(14px);
-  border: 1px solid #dce2d2;
+  border: 1px solid #e2dacb;
   border-radius: 18px;
-  box-shadow: 0 6px 35px #263c3520;
+  box-shadow: 0 6px 35px #3c352620;
   z-index: 10;
 }
 .bottom-nav a {
@@ -632,21 +632,21 @@ textarea:focus-visible {
   justify-content: center;
   flex-direction: column;
   gap: 4px;
-  color: #616f54;
+  color: #6f6654;
   font-size: 10px;
   min-height: 49px;
   border-radius: 11px;
 }
 .bottom-nav a.active {
-  background: #edf1e5;
-  color: #3e5c38;
+  background: #f1e9d9;
+  color: #5c5038;
   font-weight: 700;
 }
 .back {
   display: flex;
   gap: 3px;
   align-items: center;
-  color: #627354;
+  color: #736954;
   font-size: 12px;
   min-height: 44px;
   width: fit-content;
@@ -654,15 +654,15 @@ textarea:focus-visible {
 }
 .breadcrumbs {
   font-size: 10px;
-  color: #5d6b50;
+  color: #6b6250;
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
   margin-bottom: 16px;
 }
 .detail-hero {
-  background: #edf0e7;
-  border: 1px solid #dce3d0;
+  background: #f0e8d8;
+  border: 1px solid #e3dbcc;
   padding: 22px;
   border-radius: 19px;
   display: grid;
@@ -707,7 +707,7 @@ textarea:focus-visible {
   overflow-wrap: anywhere;
 }
 .document-panel {
-  border: 1px solid #d7dfcb;
+  border: 1px solid #dfd8c9;
   background: #fffefb;
   border-radius: 16px;
   margin-bottom: 20px;
@@ -773,7 +773,7 @@ textarea:focus-visible {
   font-size: 12px;
 }
 .empty-icon {
-  color: #7f916e;
+  color: #91856e;
 }
 .cash-start h2 {
   color: #fff;
@@ -783,7 +783,7 @@ textarea:focus-visible {
   margin: 18px 0 11px;
 }
 .cash-start p {
-  color: #d4decb;
+  color: #ded7c8;
   font-size: 13px;
 }
 .stepper {
@@ -801,7 +801,7 @@ textarea:focus-visible {
 .stepper li:before {
   content: "";
   height: 1px;
-  background: #d4dcc7;
+  background: #dcd5c6;
   position: absolute;
   top: 15px;
   left: 0;
@@ -821,28 +821,28 @@ textarea:focus-visible {
   width: 30px;
   height: 30px;
   margin: 0 auto 7px;
-  border: 1px solid #d4dcc7;
+  border: 1px solid #dcd5c6;
   border-radius: 50%;
   background: var(--paper);
   position: relative;
-  color: #5b6c49;
+  color: #6c6049;
   font-size: 11px;
 }
 .stepper small {
   font-size: 9px;
 }
 .stepper .current > span {
-  background: var(--green);
+  background: var(--accent);
   color: #fff;
-  border-color: var(--green);
+  border-color: var(--accent);
 }
 .stepper .current small {
   font-weight: 700;
-  color: var(--green);
+  color: var(--accent);
 }
 .stepper .done > span {
-  background: #e7eddd;
-  color: #49633d;
+  background: #ede5d5;
+  color: #63563d;
 }
 .form-panel h2 {
   margin-bottom: 16px;
@@ -859,7 +859,7 @@ textarea:focus-visible {
   width: 100%;
   min-width: 0;
   background: #fffefb;
-  border: 1px solid #dce2d3;
+  border: 1px solid #e2dacb;
   border-radius: 10px;
   padding: 12px;
   color: var(--ink);
@@ -904,12 +904,12 @@ textarea:focus-visible {
 .currency-input > span {
   font-size: 11px;
   font-weight: 400;
-  color: #636e58;
+  color: #6e6758;
 }
 .currency-input input {
   width: 105px;
   text-align: right;
-  color: #263d31;
+  color: #3d3526;
   padding: 6px 0;
   background: transparent;
   border: 0;
@@ -930,8 +930,8 @@ textarea:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  background: #e9eedf;
-  border: 1px solid #d7e0ca;
+  background: #eee6d6;
+  border: 1px solid #e0d9ca;
   border-radius: 12px;
   padding: 17px 15px;
   margin: 16px 0 20px;
@@ -974,7 +974,7 @@ textarea:focus-visible {
 .outflow .amount-field {
   margin-top: 16px;
   margin-bottom: 0;
-  background: #f7f8f1;
+  background: #f8f0df;
 }
 .outflow h2 {
   margin: 0;
@@ -1009,7 +1009,7 @@ textarea:focus-visible {
   border-bottom: 0;
 }
 .summary-row.total-row {
-  border-top: 1px solid #cbd6be;
+  border-top: 1px solid #d6cebe;
   margin-top: 8px;
   font-weight: 650;
 }
@@ -1021,9 +1021,9 @@ textarea:focus-visible {
   gap: 10px;
 }
 .difference.success {
-  background: #e8f0df;
-  border: 1px solid #c3d3b2;
-  color: #365833;
+  background: #f0e8d8;
+  border: 1px solid #d3c8b2;
+  color: #584c33;
 }
 .difference.warning {
   background: #f8edda;
@@ -1058,8 +1058,8 @@ textarea:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #e5edda;
-  color: #526d43;
+  background: #ede5d5;
+  color: #6d5f43;
   border-radius: 50%;
   width: 70px;
   height: 70px;
@@ -1079,17 +1079,17 @@ textarea:focus-visible {
   display: flex;
   gap: 12px;
   padding: 14px 13px;
-  border: 1px solid #dfe4d6;
+  border: 1px solid #e4dccd;
   border-radius: 12px;
   cursor: pointer;
   align-items: center;
 }
 .scenario-picker label.selected {
-  background: #eef2e6;
-  border-color: #93aa7d;
+  background: #f2eada;
+  border-color: #aa9b7d;
 }
 .scenario-picker input {
-  accent-color: var(--green);
+  accent-color: var(--accent);
   width: 17px;
   height: 17px;
   margin: 0;
@@ -1148,7 +1148,7 @@ textarea:focus-visible {
 }
 .roadmap li > span {
   font-size: 11px;
-  border: 1px solid #cbd5bd;
+  border: 1px solid #d5cdbd;
   border-radius: 8px;
   width: 32px;
   height: 32px;
@@ -1156,7 +1156,7 @@ textarea:focus-visible {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: #556c42;
+  color: #6c5e42;
 }
 .roadmap b {
   font-size: 13px;
@@ -1169,8 +1169,8 @@ textarea:focus-visible {
   font-size: 9px;
   letter-spacing: 0.6px;
   text-transform: uppercase;
-  background: #edf1e5;
-  color: #59714b;
+  background: #f1e9d9;
+  color: #71644b;
   padding: 4px 7px;
   border-radius: 4px;
 }
@@ -1201,10 +1201,10 @@ textarea:focus-visible {
 @media (hover: hover) {
   .metric-link:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px #263c3510;
+    box-shadow: 0 10px 20px #3c352610;
   }
   .row-link:hover {
-    background: #f5f7ee;
+    background: #f7efde;
   }
   .primary:hover {
     filter: brightness(1.1);
@@ -1213,7 +1213,7 @@ textarea:focus-visible {
 @media (min-width: 700px) {
   .app {
     margin: 25px auto;
-    border: 1px solid #dfe3d5;
+    border: 1px solid #e3dbcc;
     border-radius: 25px 25px 0 0;
     padding: 30px 32px 120px;
   }
@@ -1296,4 +1296,71 @@ select,
 summary {
   scroll-margin-top: 25px;
   scroll-margin-bottom: 125px;
+}
+
+/* Warm yellow palette, with dark text for mobile contrast. */
+.hero {
+  background:
+    radial-gradient(ellipse at top right, #ffe892 0, transparent 64%), #edc34b;
+  color: #3d3020;
+}
+.hero .eyebrow,
+.hero .growth,
+.hero-bottom,
+.hero-bottom b,
+.cash-start h2,
+.cash-start p {
+  color: #4d3b1c;
+}
+.hero .badge {
+  background: #fff7d9;
+  border-color: #bd922e;
+  color: #5d4619;
+}
+.hero-bottom {
+  border-color: #9d741e55;
+}
+.primary,
+.primary.gold,
+.stepper .current > span {
+  color: #3d3020;
+}
+.stepper .current small {
+  color: #725416;
+}
+.daily-chart {
+  height: 145px;
+  display: flex;
+  align-items: end;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 0 2px;
+  margin-top: 24px;
+}
+.daily-chart a {
+  position: relative;
+  flex: 0 0 24px;
+  min-height: 24px;
+  background: #d8aa32;
+  border-radius: 5px 5px 0 0;
+}
+.chart-day {
+  position: absolute;
+  bottom: 2px;
+  width: 100%;
+  text-align: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: #3d3020;
+}
+.daily-chart a:hover,
+.daily-chart a:focus-visible {
+  background: #956b12;
+}
+.chart-axis {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 10px;
+  margin-top: 8px;
 }

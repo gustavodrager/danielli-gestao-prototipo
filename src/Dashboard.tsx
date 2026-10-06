@@ -103,7 +103,7 @@ export default function Dashboard() {
             />
             <RowLink
               to="/indicadores/prime-cost"
-              title="Prime Cost estimado"
+              title="CMV + Pessoal estimado"
               subtitle="Compras + pessoal / faturamento"
               value={percent(t.primeCost!)}
             />
@@ -111,7 +111,7 @@ export default function Dashboard() {
           <Note>
             <b>Uma leitura inicial, com transparência.</b> As compras são uma
             aproximação do CMV. Sem estoques inicial e final, CMV, resultado e
-            Prime Cost permanecem estimados.
+            CMV + Pessoal permanecem estimados.
           </Note>
           <section className="panel">
             <div className="section-title">

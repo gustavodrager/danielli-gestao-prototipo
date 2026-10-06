@@ -116,7 +116,7 @@ export default function More() {
           </p>
         </div>
         <Note>
-          Compras aproximam o CMV nesta demonstração. O resultado e o Prime Cost
+          Compras aproximam o CMV nesta demonstração. O resultado e o CMV + Pessoal
           herdam essa estimativa. Médias diárias usam dias calendário, sem
           presumir dias de funcionamento.
         </Note>

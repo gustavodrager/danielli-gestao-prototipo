@@ -27,7 +27,7 @@ export function Indicator() {
   const name = calculated
     ? tipo === "resultado"
       ? "Resultado gerencial"
-      : "Prime Cost estimado"
+      : "CMV + Pessoal estimado"
     : metricNames[tipo as Metric];
   const list = entries.filter(
     (e) =>
