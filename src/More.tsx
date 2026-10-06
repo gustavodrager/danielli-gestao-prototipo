@@ -167,9 +167,10 @@ export default function More() {
         </ol>
       </section>
       <Note>
-        <b>Para validar com Higor:</b> significado das cores, categorias atuais
-        de compras, composição de pessoal, fórmula da diferença de caixa e
-        tratamento das saídas, responsáveis e critérios de conferência.
+        <b>Para validar com Higor:</b> relação das unidades com as cores das
+        comandas, categorias atuais de compras, composição de pessoal, fórmula
+        da diferença de caixa e tratamento das saídas, responsáveis e critérios
+        de conferência.
       </Note>
     </>
   );

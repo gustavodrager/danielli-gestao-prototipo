@@ -3,10 +3,12 @@ export const money = (n: number) =>
 export const percent = (n: number) =>
   `${n.toLocaleString("pt-BR", { maximumFractionDigits: 1, minimumFractionDigits: 1 })}%`;
 export const units = [
-  { id: "amarela", name: "Amarela", color: "#c99c22" },
-  { id: "azul", name: "Azul", color: "#477fa8" },
-  { id: "verde", name: "Verde", color: "#528367" },
-  { id: "vermelha", name: "Vermelha", color: "#ba6259" },
+  { id: "balcao", name: "Balcão" },
+  { id: "buffet", name: "Buffet" },
+  { id: "massas", name: "Massas" },
+  { id: "churrasco", name: "Churrasco" },
+  { id: "marmita", name: "Marmita" },
+  { id: "vitrine", name: "Vitrine" },
 ] as const;
 export const methods = [
   "Dinheiro",
@@ -41,7 +43,7 @@ export interface Entry {
   date: string;
   document: string;
 }
-// Fixtures de demonstração: nenhum nome, documento ou valor representa a operação real.
+// Unidades confirmadas pelo usuário; valores, origens e documentos são fictícios.
 const groups: {
   metric: Metric;
   id: string;
@@ -51,29 +53,43 @@ const groups: {
 }[] = [
   {
     metric: "faturamento",
-    id: "amarela",
-    name: "Comanda amarela",
+    id: "balcao",
+    name: "Balcão",
     source: "Livro de fechamento",
-    values: [41200, 41200],
+    values: [16200, 16200],
   },
   {
     metric: "faturamento",
-    id: "azul",
-    name: "Comanda azul",
+    id: "buffet",
+    name: "Buffet",
     source: "Livro de fechamento",
     values: [27350, 27350],
   },
   {
     metric: "faturamento",
-    id: "verde",
-    name: "Comanda verde",
+    id: "massas",
+    name: "Massas",
     source: "Livro de fechamento",
     values: [15600, 15600],
   },
   {
     metric: "faturamento",
-    id: "vermelha",
-    name: "Comanda vermelha",
+    id: "churrasco",
+    name: "Churrasco",
+    source: "Livro de fechamento",
+    values: [13000, 13000],
+  },
+  {
+    metric: "faturamento",
+    id: "marmita",
+    name: "Marmita",
+    source: "Livro de fechamento",
+    values: [12000, 12000],
+  },
+  {
+    metric: "faturamento",
+    id: "vitrine",
+    name: "Vitrine",
     source: "Livro de fechamento",
     values: [8010, 8010],
   },
@@ -144,7 +160,7 @@ export const entries: Entry[] = groups.flatMap((g) =>
     sourceName: g.source,
     amount,
     date: i === 0 ? "2026-09-15" : "2026-09-30",
-    document: `DEMO-${g.id.toUpperCase()}-${i + 1}`,
+    document: `DEMO-${g.metric === "faturamento" ? "RECEITA-" : ""}${g.id.toUpperCase()}-${i + 1}`,
   })),
 );
 export function periodEntries(period: Period, scenario: Scenario) {
@@ -231,10 +247,12 @@ export function exampleDraft(scenario: Scenario): CashDraft {
       ]),
     ),
     units: {
-      amarela: "3960,00",
-      azul: "2640,00",
-      verde: "1500,00",
-      vermelha: "770,00",
+      balcao: "1560,00",
+      buffet: "2640,00",
+      massas: "1500,00",
+      churrasco: "1400,00",
+      marmita: "1000,00",
+      vitrine: "770,00",
     },
     outflows: [
       {

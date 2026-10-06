@@ -49,7 +49,7 @@ run("click", 'a[href="/indicadores/faturamento"]');
 snapshot();
 check("document.querySelector('select').value === '2026-08'");
 check(
-  "document.body.innerText.includes('Comanda amarela') && !document.body.innerText.includes('Carnes')",
+  "document.body.innerText.includes('Balcão') && !document.body.innerText.includes('Carnes')",
 );
 click("link", "Visão geral");
 run("select", "select", "2026-07");
@@ -91,9 +91,9 @@ click("link", "Continuar rascunho");
 check("document.querySelector('input[aria-label=Pix]').value === '3000,00'");
 click("button", "Continuar");
 check("document.body.innerText.includes('8.870,00')");
-fill("Comanda azul", "1000,00");
+fill("Buffet", "1000,00");
 check("document.body.innerText.includes('difere das vendas')");
-fill("Comanda azul", "2640,00");
+fill("Buffet", "2640,00");
 click("button", "Continuar");
 click("button", "Remover saída 1");
 click("button", "+ Adicionar saída");
@@ -117,7 +117,7 @@ check(
   "location.pathname === '/caixa/concluido' && document.body.innerText.includes('SIMULAÇÃO CONCLUÍDA')",
 );
 passed(
-  "Caixa: validação, rascunho, edição, comandas, saídas, retorno e conclusão",
+  "Caixa: validação, rascunho, edição, unidades, saídas, retorno e conclusão",
 );
 click("link", "Mais");
 run("find", "label", "Diferença no caixa", "check");

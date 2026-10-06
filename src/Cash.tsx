@@ -20,7 +20,7 @@ const stepPaths = [
   "/caixa/novo/saidas",
   "/caixa/novo/conferencia",
 ];
-const stepNames = ["Recebimentos", "Comandas", "Saídas", "Conferência"];
+const stepNames = ["Recebimentos", "Unidades", "Saídas", "Conferência"];
 const history = [
   { id: "04", draft: { ...exampleDraft("regular"), date: "2026-10-04" } },
   { id: "03", draft: { ...exampleDraft("diferenca"), date: "2026-10-03" } },
@@ -108,14 +108,17 @@ export function Cash() {
         </section>
       ) : (
         <section className="hero cash-start">
-          <span className="eyebrow">{draft.date ? dateLabel(draft.date) : "DATA NÃO INFORMADA"} · SIMULAÇÃO</span>
+          <span className="eyebrow">
+            {draft.date ? dateLabel(draft.date) : "DATA NÃO INFORMADA"} ·
+            SIMULAÇÃO
+          </span>
           <h2>
             {hasDraft ? "Seu rascunho está aqui." : "Vamos fechar o dia?"}
           </h2>
           <p>
             {hasDraft
               ? "Continue de onde parou nesta sessão."
-              : "Recebimentos, comandas, saídas e conferência em uma sequência simples."}
+              : "Recebimentos, unidades, saídas e conferência em uma sequência simples."}
           </p>
           <Link className="primary gold" to="/caixa/novo">
             {hasDraft ? "Continuar rascunho" : "Iniciar fechamento"}{" "}
@@ -181,7 +184,7 @@ export function CashFlow({ step }: { step: number }) {
         ? cashErrors({ ...draft, units: emptyDraft().units, outflows: [] })
         : step === 2
           ? Object.values(draft.units).some((v) => cents(v) === null)
-            ? ["Revise os valores das comandas."]
+            ? ["Revise os valores das unidades."]
             : []
           : step === 3
             ? cashErrors(draft).filter((e) => e.startsWith("Preencha"))
@@ -320,17 +323,16 @@ export function CashFlow({ step }: { step: number }) {
           </>
         ) : step === 2 ? (
           <>
-            <p>Informe o faturamento identificado pelas cores das comandas.</p>
+            <p>Informe o faturamento identificado por unidade de negócio.</p>
             <Note>
-              As cores representam a origem da receita. Sem rateio de despesas
-              ou custos. Se ainda não houver separação por cor, deixe os campos
-              em branco.
+              As unidades representam a origem da receita. Sem rateio de
+              despesas ou custos. Se ainda não houver separação por unidade,
+              deixe os campos em branco.
             </Note>
             {units.map((u) => (
               <AmountInput
                 key={u.id}
-                label={`Comanda ${u.name.toLowerCase()}`}
-                color={u.color}
+                label={u.name}
                 value={draft.units[u.id]}
                 onChange={(value) =>
                   update({ units: { ...draft.units, [u.id]: value } })
@@ -338,20 +340,20 @@ export function CashFlow({ step }: { step: number }) {
               />
             ))}
             <div className="total-strip">
-              <span>Total identificado por cor</span>
+              <span>Total identificado por unidade</span>
               <strong>{money(t.mix / 100)}</strong>
             </div>
             {t.mix !== t.sales ? (
               <Note tone="warning">
                 {t.mix === 0
-                  ? "Sem distribuição por cor informada."
-                  : `O total por cor difere das vendas em ${money((t.mix - t.sales) / 100)}.`}{" "}
+                  ? "Sem distribuição por unidade informada."
+                  : `O total por unidade difere das vendas em ${money((t.mix - t.sales) / 100)}.`}{" "}
                 A diferença fica visível para conferência, sem criar uma regra
                 de bloqueio.
               </Note>
             ) : (
               <Note tone="success">
-                O total por cor corresponde às vendas informadas.
+                O total por unidade corresponde às vendas informadas.
               </Note>
             )}
           </>
@@ -458,7 +460,7 @@ export function CashFlow({ step }: { step: number }) {
             <CashSummary draft={draft} />
             <div className="edit-links">
               <Link to={stepPaths[0]}>Editar recebimentos</Link>
-              <Link to={stepPaths[1]}>Editar comandas</Link>
+              <Link to={stepPaths[1]}>Editar unidades</Link>
               <Link to={stepPaths[2]}>Editar saídas</Link>
             </div>
             <Note>
@@ -554,16 +556,13 @@ function CashSummary({ draft }: { draft: CashDraft }) {
         com Higor.
       </p>
       <section className="panel">
-        <h2>Receita por cor de comanda</h2>
+        <h2>Receita por unidade de negócio</h2>
         {t.mix === 0 ? (
           <p>Distribuição não informada.</p>
         ) : (
           units.map((u) => (
             <div className="summary-row" key={u.id}>
-              <span>
-                <i className="unit-dot" style={{ background: u.color }} />{" "}
-                {u.name}
-              </span>
+              <span>{u.name}</span>
               <b>
                 {cents(draft.units[u.id]) === null
                   ? "Valor inválido"
@@ -574,7 +573,7 @@ function CashSummary({ draft }: { draft: CashDraft }) {
         )}
         {t.mix !== t.sales ? (
           <Note tone="warning">
-            Distribuição por cor ainda não corresponde ao total de vendas.
+            Distribuição por unidade ainda não corresponde ao total de vendas.
           </Note>
         ) : null}
       </section>

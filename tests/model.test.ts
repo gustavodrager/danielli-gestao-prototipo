@@ -27,7 +27,11 @@ test("composição e resultado reconciliam com os lançamentos fictícios", () =
   assert.equal(
     sum(
       groups.map((g) =>
-        sum(entries.filter((e) => e.group === g).map((e) => e.amount)),
+        sum(
+          entries
+            .filter((e) => e.metric === "faturamento" && e.group === g)
+            .map((e) => e.amount),
+        ),
       ),
     ),
     t.revenue,

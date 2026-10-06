@@ -166,42 +166,32 @@ export default function Dashboard() {
             <div className="section-title">
               <div>
                 <span className="eyebrow">ORIGEM DO FATURAMENTO</span>
-                <h2>As cores do seu negócio</h2>
+                <h2>Faturamento por unidade</h2>
               </div>
               <Link className="text-link" to="/indicadores/faturamento">
                 Detalhar ↗
               </Link>
             </div>
-            <p className="muted">Unidades identificadas pelas comandas</p>
-            <div className="mix-bar" aria-hidden="true">
-              {units.map((u) => (
-                <span
-                  key={u.id}
-                  style={{
-                    background: u.color,
-                    width: `${(sum(entries.filter((e) => e.group === u.id).map((e) => e.amount)) / t.revenue) * 100}%`,
-                  }}
-                />
-              ))}
-            </div>
+            <p className="muted">Participação das unidades no faturamento</p>
             {units.map((u) => {
               const value = sum(
-                entries.filter((e) => e.group === u.id).map((e) => e.amount),
+                entries
+                  .filter((e) => e.metric === "faturamento" && e.group === u.id)
+                  .map((e) => e.amount),
               );
               return (
                 <RowLink
                   key={u.id}
                   to={`/indicadores/faturamento/${u.id}`}
-                  title={`Comanda ${u.name.toLowerCase()}`}
+                  title={u.name}
                   subtitle={`${percent((value / t.revenue) * 100)} do faturamento`}
                   value={money(value)}
-                  color={u.color}
                 />
               );
             })}
             <p className="chart-note">
-              A cor identifica receita. A relação entre cor e operação será
-              validada com Higor.
+              Valores fictícios por unidade. A relação com as cores das comandas
+              será validada com Higor.
             </p>
           </section>
         </>

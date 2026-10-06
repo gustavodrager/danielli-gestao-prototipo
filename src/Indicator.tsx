@@ -100,7 +100,7 @@ export function Indicator() {
           {tipo === "despesas" || tipo === "pessoal" ? (
             <Note>
               Valores gerais da Danielli. As categorias de exemplo devem ser
-              confirmadas com Higor. Não há distribuição por cor de comanda.
+              confirmadas com Higor. Não há rateio por unidade de negócio.
             </Note>
           ) : null}
           {calculated ? (
@@ -158,7 +158,7 @@ export function Indicator() {
                   : grupo
                     ? "Fornecedor / origem"
                     : tipo === "faturamento"
-                      ? "Composição por comanda"
+                      ? "Composição por unidade"
                       : "Composição por categoria"}
               </h2>
               <div className="panel compact">
