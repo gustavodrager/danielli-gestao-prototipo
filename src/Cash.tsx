@@ -13,7 +13,10 @@ import {
   units,
   type CashDraft,
 } from "./data";
+import { unitSalesSummary } from "./unit-sales";
+import { upsertByDate } from "./local-state";
 import { Back, Badge, Icon, Note, RowLink } from "./ui";
+import { RealCashDetail, RealHistoryList } from "./Real";
 const stepPaths = [
   "/caixa/novo",
   "/caixa/novo/unidades",
@@ -39,7 +42,7 @@ function AmountInput({
   color?: string;
   required?: boolean;
 }) {
-  const invalid = cents(value) === null;
+  const invalid = !!value.trim() && cents(value) === null;
   return (
     <label className={`amount-field ${invalid ? "invalid" : ""}`}>
       <span>
@@ -55,7 +58,8 @@ function AmountInput({
           aria-label={label}
           value={value}
           inputMode="decimal"
-          placeholder="0,00"
+          placeholder="—"
+          enterKeyHint="next"
           onChange={(e) => onChange(e.target.value)}
           aria-invalid={invalid}
           required={required}
@@ -66,7 +70,15 @@ function AmountInput({
   );
 }
 export function Cash() {
-  const { draft, setDraft, closed, setClosed, scenario } = useDemo();
+  const {
+    draft,
+    setDraft,
+    closed,
+    setClosed,
+    scenario,
+    setProfile,
+    cashRecords,
+  } = useDemo();
   const hasDraft =
     draft.responsible !== "" ||
     draft.sales !== "" ||
@@ -74,16 +86,24 @@ export function Cash() {
   return (
     <>
       <span className="eyebrow">PRIMEIRA ROTINA DIGITAL</span>
-      <h1>
-        Caixa, com cuidado
-        <br />
-        <em>em cada detalhe.</em>
-      </h1>
+      <h1>Caixa e conferência</h1>
       <p>Represente o fechamento que a equipe já faz.</p>
       <Note>
-        Simulação sem envio ou gravação permanente. Os dados digitados ficam
-        nesta sessão e se perdem ao recarregar a página.
+        Simulação local, sem envio ao servidor. Rascunho recuperável ao
+        recarregar esta aba. Apague os dados em Mais ao terminar em dispositivo
+        compartilhado.
       </Note>
+      <section className="panel">
+        <h2>Entrada simples por unidade</h2>
+        <p>Data e totais vendidos nas seis unidades.</p>
+        <Link
+          className="primary"
+          to="/caixa/vendas"
+          onClick={() => setProfile("caixa")}
+        >
+          Informar vendas por unidade <Icon name="arrow" size={16} />
+        </Link>
+      </section>
       {closed ? (
         <section className="panel">
           <div className="section-title">
@@ -126,14 +146,31 @@ export function Cash() {
           </Link>
         </section>
       )}
+      {cashRecords.length ? (
+        <section className="panel">
+          <h2>Fechamentos locais · simulação</h2>
+          {cashRecords.map((r) => (
+            <RowLink
+              key={r.localId}
+              to={`/caixa/historico/local-${r.localId}`}
+              title={dateLabel(r.date)}
+              subtitle="Registrado nesta aba · editar disponível"
+            />
+          ))}
+        </section>
+      ) : null}
       {scenario === "diferenca" ? (
         <Note tone="warning">
           Cenário selecionado: diferença de R$ 32,00. Dentro do fechamento, use
           “Preencher exemplo fictício” para explorar.
         </Note>
       ) : null}
-      <h2>Histórico de exemplo</h2>
-      {scenario === "vazio" ? (
+      {scenario === "real" ? (
+        <RealHistoryList />
+      ) : (
+        <h2>Histórico de exemplo</h2>
+      )}
+      {scenario === "real" ? null : scenario === "vazio" ? (
         <section className="panel">
           <p>
             Nenhum fechamento neste cenário. Você pode iniciar uma simulação
@@ -152,7 +189,7 @@ export function Cash() {
                 subtitle={
                   t.difference === 0
                     ? "Sem diferença · fictício"
-                    : `Diferença ${money(t.difference / 100)} · fictício`
+                    : `Diferença ${money((t.difference ?? 0) / 100)} · fictício`
                 }
                 value={money(t.receipts / 100)}
               />
@@ -164,7 +201,20 @@ export function Cash() {
   );
 }
 export function CashFlow({ step }: { step: number }) {
-  const { draft, setDraft, closed, setClosed, scenario } = useDemo();
+  const {
+    draft,
+    setDraft,
+    closed,
+    setClosed,
+    scenario,
+    unitSalesRecords,
+    unitSalesDraft,
+    setCashRecords,
+    setUnitSalesRecords,
+    setUnitSalesDraft,
+    setUnitSalesRecord,
+    localSaved,
+  } = useDemo();
   const navigate = useNavigate();
   const [errors, setErrors] = useState<string[]>([]);
   const errorRef = useRef<HTMLDivElement>(null);
@@ -194,7 +244,31 @@ export function CashFlow({ step }: { step: number }) {
       return;
     }
     if (step === 4) {
-      setClosed(structuredClone(draft));
+      const completed = {
+        ...structuredClone(draft),
+        localId: draft.localId || crypto.randomUUID(),
+      };
+      setClosed(completed);
+      setCashRecords((current) => [
+        ...current.filter((r) => r.localId !== completed.localId),
+        completed,
+      ]);
+      const shared = {
+        date: draft.date,
+        values: draft.units as typeof unitSalesDraft.values,
+      };
+      const summary = unitSalesSummary(shared);
+      if (summary.total !== null) {
+        const record = {
+          date: draft.date,
+          values: summary.values,
+          total: summary.total,
+          count: summary.count,
+        };
+        setUnitSalesRecords((current) => upsertByDate(current, record));
+        setUnitSalesDraft(shared);
+        setUnitSalesRecord(record);
+      }
       navigate("/caixa/concluido", { replace: true });
     } else navigate(stepPaths[step]);
   }
@@ -246,25 +320,27 @@ export function CashFlow({ step }: { step: number }) {
               para esta simulação.
             </p>
             <Note>
-              Exemplo de 05/10/2026. Valores fictícios; alterações se perdem ao
-              recarregar.
+              Simulação local. O rascunho é recuperável ao recarregar esta aba.
             </Note>
-            <div className="example-control">
-              <button
-                type="button"
-                className="secondary"
-                onClick={() => {
-                  setDraft(exampleDraft(scenario));
-                  setErrors([]);
-                }}
-              >
-                Preencher exemplo fictício
-                {scenario === "diferenca" ? " com diferença" : ""}
-              </button>
-              <small>
-                Substitui todos os campos do rascunho pelos dados do exemplo.
-              </small>
-            </div>
+            <details className="panel">
+              <summary>Exemplo fictício para demonstração</summary>
+              <div className="example-control">
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => {
+                    setDraft(exampleDraft(scenario));
+                    setErrors([]);
+                  }}
+                >
+                  Preencher exemplo fictício
+                  {scenario === "diferenca" ? " com diferença" : ""}
+                </button>
+                <small>
+                  Substitui todos os campos do rascunho pelos dados do exemplo.
+                </small>
+              </div>
+            </details>
             <section className="panel form-panel">
               <h2>Dados do fechamento</h2>
               <label className="text-field">
@@ -316,14 +392,42 @@ export function CashFlow({ step }: { step: number }) {
             ))}
             <div className="total-strip" aria-live="polite">
               <span>
-                Total registrado <Badge kind="calculado" />
+                {t.receiptCount < 6 ? "Total parcial" : "Total registrado"} ·{" "}
+                {t.receiptCount}/6 <Badge kind="calculado" />
               </span>
-              <strong>{money(t.receipts / 100)}</strong>
+              <strong>
+                {t.receiptCount ? money(t.receipts / 100) : "Não informado"}
+              </strong>
             </div>
           </>
         ) : step === 2 ? (
           <>
-            <p>Informe o faturamento identificado por unidade de negócio.</p>
+            <p>
+              Confira os valores por unidade. A referência de vendas permanece
+              independente.
+            </p>
+            {(() => {
+              const saved = unitSalesRecords.find((r) => r.date === draft.date);
+              const source = saved
+                ? Object.fromEntries(
+                    Object.entries(saved.values).map(([id, v]) => [
+                      id,
+                      v === null ? "" : (v / 100).toFixed(2),
+                    ]),
+                  )
+                : unitSalesDraft.date === draft.date
+                  ? unitSalesDraft.values
+                  : null;
+              return source ? (
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => update({ units: { ...source } })}
+                >
+                  Reaproveitar vendas de {dateLabel(draft.date)}
+                </button>
+              ) : null;
+            })()}
             <Note>
               As unidades representam a origem da receita. Sem rateio de
               despesas ou custos. Se ainda não houver separação por unidade,
@@ -340,12 +444,24 @@ export function CashFlow({ step }: { step: number }) {
               />
             ))}
             <div className="total-strip">
-              <span>Total identificado por unidade</span>
-              <strong>{money(t.mix / 100)}</strong>
+              <span>
+                Total {t.unitCount < 6 ? "parcial " : ""}por unidade ·{" "}
+                {t.unitCount}/6
+              </span>
+              <strong>
+                {t.unitCount ? money(t.mix / 100) : "Não informado"}
+              </strong>
             </div>
-            {t.mix !== t.sales ? (
+            {t.unitCount < 6 ? (
+              <Note>
+                Cobertura de {t.unitCount}/6 unidades.{" "}
+                {t.unitCount
+                  ? "Soma parcial; não permite conferir a distribuição completa."
+                  : "Distribuição não informada."}
+              </Note>
+            ) : t.mix !== t.sales ? (
               <Note tone="warning">
-                {t.mix === 0
+                {t.unitCount === 0
                   ? "Sem distribuição por unidade informada."
                   : `O total por unidade difere das vendas em ${money((t.mix - t.sales) / 100)}.`}{" "}
                 A diferença fica visível para conferência, sem criar uma regra
@@ -478,6 +594,11 @@ export function CashFlow({ step }: { step: number }) {
                 : "Continuar"}{" "}
             <Icon name={step === 4 ? "check" : "arrow"} size={18} />
           </button>
+          <p className="hint" role="status">
+            {localSaved
+              ? "Salvo nesta aba · recuperável ao recarregar · sem envio ao servidor"
+              : "Armazenamento indisponível · rascunho somente em memória"}
+          </p>
           <Link className="save-draft" to="/caixa">
             Sair e manter rascunho nesta sessão
           </Link>
@@ -489,7 +610,7 @@ export function CashFlow({ step }: { step: number }) {
 function CashSummary({ draft }: { draft: CashDraft }) {
   const t = cashTotals(draft);
   const errors = cashErrors(draft);
-  const invalid = errors.length > 0;
+  const invalid = errors.length > 0 || t.difference === null;
   return (
     <>
       <dl className="panel fact-list">
@@ -515,15 +636,22 @@ function CashSummary({ draft }: { draft: CashDraft }) {
           <div className="summary-row" key={m}>
             <span>{m}</span>
             <b>
-              {cents(draft.receipts[m]) === null
-                ? "Valor inválido"
-                : money((cents(draft.receipts[m]) ?? 0) / 100)}
+              {!draft.receipts[m].trim()
+                ? "Não informado"
+                : cents(draft.receipts[m]) === null
+                  ? "Valor inválido"
+                  : money((cents(draft.receipts[m]) ?? 0) / 100)}
             </b>
           </div>
         ))}
         <div className="summary-row total-row">
-          <span>Total registrado</span>
-          <b>{invalid ? "Revise os campos" : money(t.receipts / 100)}</b>
+          <span>
+            {t.receiptCount < 6
+              ? "Total parcial de recebimentos"
+              : "Total registrado"}{" "}
+            · {t.receiptCount}/6
+          </span>
+          <b>{t.receiptCount ? money(t.receipts / 100) : "Não informado"}</b>
         </div>
         <div className="summary-row">
           <span>Total de vendas</span>
@@ -539,13 +667,15 @@ function CashSummary({ draft }: { draft: CashDraft }) {
         aria-live="polite"
       >
         <span className="eyebrow">DIFERENÇA DEMONSTRATIVA</span>
-        <strong>{invalid ? "A conferir" : money(t.difference / 100)}</strong>
+        <strong>
+          {invalid ? "A conferir" : money((t.difference ?? 0) / 100)}
+        </strong>
         <span>
           {invalid
             ? "Há campos incompletos ou inválidos."
             : t.difference === 0
               ? "Recebimentos correspondem às vendas informadas."
-              : t.difference < 0
+              : (t.difference ?? 0) < 0
                 ? "Recebimentos abaixo das vendas informadas."
                 : "Recebimentos acima das vendas informadas."}
         </span>
@@ -556,22 +686,26 @@ function CashSummary({ draft }: { draft: CashDraft }) {
         com Higor.
       </p>
       <section className="panel">
-        <h2>Receita por unidade de negócio</h2>
-        {t.mix === 0 ? (
+        <h2>Receita por unidade de negócio · {t.unitCount}/6</h2>
+        {t.unitCount === 0 ? (
           <p>Distribuição não informada.</p>
         ) : (
           units.map((u) => (
             <div className="summary-row" key={u.id}>
               <span>{u.name}</span>
               <b>
-                {cents(draft.units[u.id]) === null
-                  ? "Valor inválido"
-                  : money((cents(draft.units[u.id]) ?? 0) / 100)}
+                {!draft.units[u.id].trim()
+                  ? "Não informado"
+                  : cents(draft.units[u.id]) === null
+                    ? "Valor inválido"
+                    : money((cents(draft.units[u.id]) ?? 0) / 100)}
               </b>
             </div>
           ))
         )}
-        {t.mix !== t.sales ? (
+        {t.unitCount < 6 ? (
+          <Note>Distribuição parcial. Ausência não representa zero.</Note>
+        ) : t.mix !== t.sales ? (
           <Note tone="warning">
             Distribuição por unidade ainda não corresponde ao total de vendas.
           </Note>
@@ -634,7 +768,12 @@ export function CashSuccess() {
 }
 export function CashHistory() {
   const { id } = useParams();
-  const record = history.find((h) => h.id === id);
+  const { cashRecords, setDraft, setClosed } = useDemo();
+  if (id?.startsWith("real-")) return <RealCashDetail id={id} />;
+  const local = cashRecords.find((r) => `local-${r.localId}` === id);
+  const record = local
+    ? { id: id!, draft: local }
+    : history.find((h) => h.id === id);
   return (
     <>
       <Back to="/caixa">Histórico do caixa</Back>
@@ -646,29 +785,43 @@ export function CashHistory() {
       {record ? (
         <>
           <Note>
-            Fechamento histórico inteiramente fictício, criado para demonstrar a
-            consulta.
+            {local
+              ? "Fechamento registrado localmente na simulação."
+              : "Fechamento inteiramente fictício de exemplo."}
           </Note>
           <CashSummary draft={record.draft} />
-          <details className="document-panel">
-            <summary>
-              <Icon name="document" />
-              Documento de exemplo
-            </summary>
-            <div className="document-preview">
-              <span className="document-watermark">FICTÍCIO</span>
-              <h2>Livro de fechamento · DEMO-{id}</h2>
-              <p>Data: {dateLabel(record.draft.date)}</p>
-              <p>Responsável: {record.draft.responsible}</p>
-              <p>
-                Total de recebimentos:{" "}
-                {money(cashTotals(record.draft).receipts / 100)}
-              </p>
-              <p className="hint">
-                Representação textual de exemplo. Não é um documento original.
-              </p>
-            </div>
-          </details>
+          {local ? (
+            <Link
+              className="secondary"
+              to="/caixa/novo"
+              onClick={() => {
+                setDraft(structuredClone(local));
+                setClosed(null);
+              }}
+            >
+              Editar fechamento local
+            </Link>
+          ) : (
+            <details className="document-panel">
+              <summary>
+                <Icon name="document" />
+                Documento de exemplo
+              </summary>
+              <div className="document-preview">
+                <span className="document-watermark">FICTÍCIO</span>
+                <h2>Livro de fechamento · DEMO-{id}</h2>
+                <p>Data: {dateLabel(record.draft.date)}</p>
+                <p>Responsável: {record.draft.responsible}</p>
+                <p>
+                  Total de recebimentos:{" "}
+                  {money(cashTotals(record.draft).receipts / 100)}
+                </p>
+                <p className="hint">
+                  Representação textual de exemplo. Não é um documento original.
+                </p>
+              </div>
+            </details>
+          )}
         </>
       ) : (
         <p>Use o histórico para escolher um fechamento disponível.</p>

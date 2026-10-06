@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { useDemo } from "./demo-context";
-import { Badge, Icon, Note } from "./ui";
+import { Badge, Icon, Note, PrototypeViews } from "./ui";
 import { type Scenario } from "./data";
+import { storagePrefix } from "./local-state";
+import { SourceNote } from "./Real";
 export default function More() {
-  const { scenario, setScenario } = useDemo();
+  const { scenario, setScenario, setProfile } = useDemo();
   return (
     <>
       <span className="eyebrow">DANIELLI GESTÃO</span>
@@ -17,18 +19,30 @@ export default function More() {
         mostrarem.
       </p>
       <section className="panel">
+        <h2>Visões do protótipo</h2>
+        <PrototypeViews />
+      </section>
+      <section className="panel">
         <div className="section-title">
-          <h2>Explore a demonstração</h2>
+          <h2>Escolha os dados da experiência</h2>
           <Icon name="spark" />
         </div>
-        <p>Escolha uma situação fictícia para testar a experiência.</p>
+        <p>
+          Comece pelo livro real. Use os cenários fictícios para explorar
+          indicadores ainda sem fonte.
+        </p>
         <fieldset className="scenario-picker">
           <legend className="sr-only">Cenário da demonstração</legend>
           {(
             [
               [
+                "real",
+                "Histórico real",
+                "31 fechamentos de julho de 2026. Valores transcritos e pendências visíveis.",
+              ],
+              [
                 "regular",
-                "Operação regular",
+                "Operação regular · fictícia",
                 "Indicadores disponíveis e exemplo de caixa sem diferença.",
               ],
               [
@@ -59,13 +73,34 @@ export default function More() {
           ))}
         </fieldset>
         <Note>
-          Trocar o cenário altera os exemplos disponíveis. Para manter suas
-          edições, o rascunho do caixa só muda quando você toca em “Preencher
-          exemplo fictício”.
+          Dados reais e fictícios aparecem em cenários separados. Para manter
+          suas edições, o rascunho do caixa só muda quando você toca em
+          “Preencher exemplo fictício”.
         </Note>
-        <Link className="primary" to="/">
+        <Link className="primary" to="/" onClick={() => setProfile("gestor")}>
           Explorar visão geral <Icon name="arrow" size={16} />
         </Link>
+      </section>
+      <section className="panel" id="local">
+        <h2>Simulações desta aba</h2>
+        <p>
+          Rascunhos e registros recuperáveis ao recarregar esta aba. Sem envio
+          ao servidor. O navegador pode restaurar a sessão; apague os dados ao
+          terminar em um dispositivo compartilhado.
+        </p>
+        <Link className="primary" to="/simulacao">
+          Acompanhar registros locais
+        </Link>
+        <button
+          className="secondary unit-new"
+          onClick={() => {
+            for (const key of Object.keys(sessionStorage))
+              if (key.startsWith(storagePrefix)) sessionStorage.removeItem(key);
+            window.location.assign("/caixa/vendas");
+          }}
+        >
+          Apagar todos os dados da simulação nesta aba
+        </button>
       </section>
       <section className="panel">
         <h2>Um roteiro para apresentar ao Higor</h2>
@@ -73,17 +108,28 @@ export default function More() {
           <li>
             <b>Enxergar o todo</b>
             <p>
-              Abra setembro e leia faturamento, compras, despesas e resultado.
+              Comece em julho real: consulte as vendas, os recebimentos e as
+              pendências do livro. Para compras e resultado, selecione o cenário
+              fictício em setembro.
             </p>
             <Link to="/">Ir para os indicadores ↗</Link>
           </li>
           <li>
             <b>Entender a origem</b>
             <p>
-              Toque em CMV, escolha Carnes, siga até a origem e abra o documento
-              fictício.
+              No histórico real, abra um dia e siga até a foto original no
+              Drive. No cenário fictício, explore compras até o documento de
+              exemplo.
             </p>
-            <Link to="/indicadores/cmv">Explorar a composição ↗</Link>
+            <Link
+              to={
+                scenario === "real"
+                  ? "/indicadores/faturamento"
+                  : "/indicadores/cmv"
+              }
+            >
+              Explorar a composição ↗
+            </Link>
           </li>
           <li>
             <b>Fechar o dia</b>
@@ -97,11 +143,13 @@ export default function More() {
       </section>
       <section className="panel" id="qualidade">
         <h2>O que cada número significa</h2>
+        <SourceNote />
         <div className="quality-row">
           <Badge kind="observado" />
           <p>
-            Valor transcrito de um registro. Nesta demonstração, todos os
-            registros são fictícios.
+            Valor escrito em um registro. Julho vem das fotos reais do livro; a
+            transcrição ainda deve ser conferida. Os outros cenários são
+            identificados como fictícios.
           </p>
         </div>
         <div className="quality-row">
@@ -116,9 +164,10 @@ export default function More() {
           </p>
         </div>
         <Note>
-          Compras aproximam o CMV nesta demonstração. O resultado e o CMV + Pessoal
-          herdam essa estimativa. Médias diárias usam dias calendário, sem
-          presumir dias de funcionamento.
+          No cenário fictício, compras aproximam o CMV. Resultado e CMV +
+          Pessoal herdam essa estimativa. No histórico real, esses indicadores
+          aguardam fontes suficientes. Nenhuma lacuna é preenchida com
+          estimativa silenciosa.
         </Note>
       </section>
       <section className="panel">
@@ -169,8 +218,10 @@ export default function More() {
       <Note>
         <b>Para validar com Higor:</b> relação das unidades com as cores das
         comandas, categorias atuais de compras, composição de pessoal, fórmula
-        da diferença de caixa e tratamento das saídas, responsáveis e critérios
-        de conferência.
+        da diferença de caixa e tratamento das saídas, referência de faturamento
+        entre vendas e registrado, demais descrições do livro, responsáveis e
+        critérios de conferência. Almoço → Buffet, Marmitex → Marmita e Lojista
+        → Vitrine já estão confirmados.
       </Note>
     </>
   );

@@ -8,7 +8,8 @@
     "build": "tsc --noEmit -p tsconfig.app.json && vite build",
     "preview": "vite preview",
     "test": "node --experimental-strip-types --test tests/model.test.ts",
-    "test:ui": "node tests/ui-check.mjs"
+    "test:ui": "node tests/ux-check.mjs",
+    "test:ui:legacy": "node tests/ui-check.mjs"
   },
   "dependencies": {
     "react": "latest",
@@ -16,10 +17,11 @@
     "react-router-dom": "latest"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "latest",
-    "vite": "latest",
-    "typescript": "latest",
     "@types/react": "latest",
-    "@types/react-dom": "latest"
+    "@types/react-dom": "latest",
+    "@vitejs/plugin-react": "latest",
+    "playwright": "^1.63.0",
+    "typescript": "latest",
+    "vite": "latest"
   }
 }

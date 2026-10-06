@@ -5,12 +5,16 @@ import Dashboard from "./Dashboard";
 import { Indicator, EntryDetail } from "./Indicator";
 import { Cash, CashFlow, CashHistory, CashSuccess } from "./Cash";
 import More from "./More";
+import UnitSales from "./UnitSales";
+import PurchaseInput from "./PurchaseInput";
+import Simulation from "./Simulation";
 export default function App() {
   return (
     <DemoProvider>
       <Shell>
         <Routes>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/simulacao" element={<Simulation />} />
           <Route path="/indicadores/:tipo" element={<Indicator />} />
           <Route path="/indicadores/:tipo/:grupo" element={<Indicator />} />
           <Route
@@ -19,6 +23,8 @@ export default function App() {
           />
           <Route path="/lancamentos/:id" element={<EntryDetail />} />
           <Route path="/caixa" element={<Cash />} />
+          <Route path="/caixa/vendas" element={<UnitSales />} />
+          <Route path="/compras/cmv" element={<PurchaseInput />} />
           <Route path="/caixa/novo" element={<CashFlow step={1} />} />
           <Route path="/caixa/novo/unidades" element={<CashFlow step={2} />} />
           <Route path="/caixa/novo/saidas" element={<CashFlow step={3} />} />

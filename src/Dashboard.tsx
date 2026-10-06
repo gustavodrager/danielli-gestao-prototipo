@@ -11,22 +11,28 @@ import {
   units,
 } from "./data";
 import { Badge, Empty, Icon, Note, PeriodSelect, RowLink } from "./ui";
+import { RealDashboard } from "./Real";
+import UnitSales from "./UnitSales";
+import PurchaseInput from "./PurchaseInput";
 export default function Dashboard() {
-  const { entries, period, scenario, closed } = useDemo();
+  const { entries, period, scenario, closed, profile } = useDemo();
+  if (profile === "caixa") return <UnitSales />;
+  if (profile === "compras") return <PurchaseInput />;
+  if (scenario === "real")
+    return (
+      <>
+        <RealDashboard />
+        <Link className="secondary" to="/simulacao">
+          Ver indicadores dos registros locais · simulação
+        </Link>
+      </>
+    );
   const t = totals(entries);
   const previous = totals(periodEntries("2026-08", "regular"));
   const growth = (t.revenue / previous.revenue - 1) * 100;
   return (
     <>
-      <div className="welcome">
-        <span className="eyebrow">GESTÃO COM CLAREZA</span>
-        <h1>
-          Seu negócio,
-          <br />
-          <em>em perspectiva.</em>
-        </h1>
-        <p>Do número à origem. Tudo ao seu alcance.</p>
-      </div>
+      <h1 className="sr-only">Visão geral</h1>
       <PeriodSelect />
       <div className="period-caption">
         <span>Histórico de exemplo</span>
@@ -60,6 +66,38 @@ export default function Dashboard() {
               <span>Ver composição ↗</span>
             </div>
           </Link>
+          <section className="panel">
+            <div className="section-title">
+              <div>
+                <span className="eyebrow">ORIGEM DO FATURAMENTO</span>
+                <h2>Faturamento por unidade</h2>
+              </div>
+              <Link className="text-link" to="/indicadores/faturamento">
+                Detalhar ↗
+              </Link>
+            </div>
+            <p className="muted">Participação das unidades no faturamento</p>
+            {units.map((u) => {
+              const value = sum(
+                entries
+                  .filter((e) => e.metric === "faturamento" && e.group === u.id)
+                  .map((e) => e.amount),
+              );
+              return (
+                <RowLink
+                  key={u.id}
+                  to={`/indicadores/faturamento/${u.id}`}
+                  title={u.name}
+                  subtitle={`${percent((value / t.revenue) * 100)} do faturamento`}
+                  value={money(value)}
+                />
+              );
+            })}
+            <p className="chart-note">
+              Valores fictícios por unidade. A relação com as cores das comandas
+              será validada com Higor.
+            </p>
+          </section>
           <div className="metric-grid">
             <Link className="metric panel" to="/indicadores/cmv">
               <span className="eyebrow">CMV ESTIMADO</span>
@@ -162,38 +200,6 @@ export default function Dashboard() {
               Julho sem dados importados. Não representa faturamento zero.
             </p>
           </section>
-          <section className="panel">
-            <div className="section-title">
-              <div>
-                <span className="eyebrow">ORIGEM DO FATURAMENTO</span>
-                <h2>Faturamento por unidade</h2>
-              </div>
-              <Link className="text-link" to="/indicadores/faturamento">
-                Detalhar ↗
-              </Link>
-            </div>
-            <p className="muted">Participação das unidades no faturamento</p>
-            {units.map((u) => {
-              const value = sum(
-                entries
-                  .filter((e) => e.metric === "faturamento" && e.group === u.id)
-                  .map((e) => e.amount),
-              );
-              return (
-                <RowLink
-                  key={u.id}
-                  to={`/indicadores/faturamento/${u.id}`}
-                  title={u.name}
-                  subtitle={`${percent((value / t.revenue) * 100)} do faturamento`}
-                  value={money(value)}
-                />
-              );
-            })}
-            <p className="chart-note">
-              Valores fictícios por unidade. A relação com as cores das comandas
-              será validada com Higor.
-            </p>
-          </section>
         </>
       )}
       <section className="panel cash-teaser">
@@ -207,7 +213,7 @@ export default function Dashboard() {
         <p>
           {closed
             ? "Você concluiu uma simulação nesta sessão."
-            : "05 out 2026 · pronto para simular"}
+            : "Pronto para simular"}
         </p>
         {scenario === "diferenca" && !closed ? (
           <Note tone="warning">

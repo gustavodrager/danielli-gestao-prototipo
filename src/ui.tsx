@@ -1,7 +1,8 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useDemo } from "./demo-context";
-import { periods, type Period } from "./data";
+import { periods, units, metricNames, type Metric, type Period } from "./data";
+import { currentPrototypeView, prototypeViews } from "./prototype-views";
 export function Icon({
   name,
   size = 20,
@@ -43,12 +44,105 @@ export function Icon({
     </svg>
   );
 }
+export function PrototypeViews({ onSelect }: { onSelect?: () => void }) {
+  const { pathname } = useLocation();
+  const { profile, setProfile } = useDemo();
+  const selected = currentPrototypeView(pathname, profile);
+  return (
+    <div className="view-options">
+      {prototypeViews.map((view) => (
+        <Link
+          key={view.id}
+          to={view.path}
+          className={selected === view.id ? "selected" : ""}
+          aria-current={selected === view.id ? "page" : undefined}
+          onClick={() => {
+            setProfile(view.profile);
+            onSelect?.();
+          }}
+        >
+          <Icon name={view.icon} />
+          <span>
+            <b>{view.name}</b>
+            <small>{view.description}</small>
+          </span>
+          {selected === view.id ? <Icon name="check" size={16} /> : null}
+        </Link>
+      ))}
+    </div>
+  );
+}
+function ViewMenu() {
+  const { pathname } = useLocation();
+  const ref = useRef<HTMLDetailsElement>(null);
+  useEffect(() => {
+    if (ref.current) ref.current.open = false;
+  }, [pathname]);
+  useEffect(() => {
+    const close = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        ref.current &&
+        !ref.current.contains(event.target)
+      )
+        ref.current.open = false;
+    };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, []);
+  return (
+    <details
+      className="view-menu"
+      ref={ref}
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && ref.current) {
+          ref.current.open = false;
+          ref.current.querySelector("summary")?.focus();
+        }
+      }}
+    >
+      <summary
+        role="button"
+        aria-label="Mudar visão do protótipo"
+        title="Mudar visão do protótipo"
+      >
+        <Icon name="more" />
+      </summary>
+      <nav aria-label="Visões do protótipo">
+        <span className="eyebrow">VISÕES DO PROTÓTIPO</span>
+        <PrototypeViews
+          onSelect={() => {
+            if (ref.current) ref.current.open = false;
+          }}
+        />
+      </nav>
+    </details>
+  );
+}
 export function Shell({ children }: { children: ReactNode }) {
   const { pathname, hash } = useLocation();
+  const scrollPositions = useRef<Record<string, number>>({});
+  const lastPath = useRef(pathname);
+  const { scenario, profile } = useDemo();
+  const simulation =
+    pathname === "/simulacao" ||
+    pathname.startsWith("/caixa/historico/local-") ||
+    pathname.startsWith("/caixa/novo") ||
+    pathname === "/caixa/concluido" ||
+    pathname === "/caixa/vendas" ||
+    pathname === "/compras/cmv" ||
+    (pathname === "/" && profile !== "gestor");
+  const real = pathname.startsWith("/caixa/historico/")
+    ? pathname.startsWith("/caixa/historico/real-")
+    : scenario === "real";
   const mainRef = useRef<HTMLElement>(null);
   const first = useRef(true);
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const key = pathname;
+    lastPath.current = key;
+    requestAnimationFrame(() =>
+      window.scrollTo(0, scrollPositions.current[key] ?? 0),
+    );
     if (!first.current) mainRef.current?.focus({ preventScroll: true });
     first.current = false;
     const heading = mainRef.current?.querySelector("h1")?.textContent;
@@ -56,53 +150,133 @@ export function Shell({ children }: { children: ReactNode }) {
       ? `${heading} · Danielli Gestão`
       : "Danielli Gestão";
     if (hash) document.getElementById(hash.slice(1))?.scrollIntoView();
-  }, [pathname, hash]);
+  }, [pathname, hash, scenario, profile]);
+  useEffect(() => {
+    const track = () => {
+      scrollPositions.current[lastPath.current] = window.scrollY;
+    };
+    window.addEventListener("scroll", track, { passive: true });
+    return () => window.removeEventListener("scroll", track);
+  }, []);
   return (
-    <div className="app">
+    <div className={`app ${simulation ? "operational" : "manager"}`}>
       <a className="skip-link" href="#content">
         Pular para conteúdo
       </a>
       <header className="brand-header">
-        <Link className="brand" to="/" aria-label="Danielli Gestão, início">
-          <span className="brand-mark">
-            D<span>✦</span>
-          </span>
-          <span>
-            <b>DANIELLI</b>
-            <small>RESTAURANTE & DOCERIA</small>
+        <Link
+          className="brand"
+          to={
+            profile === "caixa"
+              ? "/caixa/vendas"
+              : profile === "compras"
+                ? "/compras/cmv"
+                : "/"
+          }
+          aria-label="Danielli Gestão, início"
+        >
+          <span className="brand-logo">
+            <img
+              src="/danielli-logo.png"
+              alt="Danielli Restaurante & Doceria"
+              width="398"
+              height="140"
+            />
           </span>
         </Link>
+        <ViewMenu />
         <Link className="demo-pill" to="/mais">
-          DEMONSTRAÇÃO
+          {simulation
+            ? "SIMULAÇÃO"
+            : real
+              ? "HISTÓRICO REAL"
+              : "DADOS FICTÍCIOS"}
         </Link>
       </header>
-      <main id="content" ref={mainRef} tabIndex={-1}>
+      <main
+        id="content"
+        ref={mainRef}
+        tabIndex={-1}
+        onKeyDown={(event) => {
+          if (
+            event.key !== "Enter" ||
+            !(event.target instanceof HTMLInputElement) ||
+            event.target.type === "checkbox" ||
+            event.target.type === "radio"
+          )
+            return;
+          const form = event.target.closest("form");
+          if (!form) return;
+          event.preventDefault();
+          const fields = Array.from(
+            form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
+              "input:not([disabled]), textarea:not([disabled])",
+            ),
+          );
+          const next = fields[fields.indexOf(event.target) + 1];
+          if (next) {
+            next.focus();
+            next.scrollIntoView({ block: "nearest" });
+          } else
+            form
+              .querySelector<HTMLButtonElement>('button[type="submit"]')
+              ?.focus();
+        }}
+      >
         {children}
       </main>
       <footer className="page-footer">
-        Dados fictícios · Danielli Gestão
+        {simulation
+          ? "Simulação local · dados desta aba"
+          : real
+            ? "Histórico real · transcrição a conferir"
+            : "Dados fictícios · Danielli Gestão"}
         <br />
         Feito para enxergar o negócio com clareza.
       </footer>
       <nav className="bottom-nav" aria-label="Navegação principal">
-        <NavLink
-          to="/"
-          end
-          className={() =>
-            pathname === "/" ||
-            pathname.startsWith("/indicadores/") ||
-            pathname.startsWith("/lancamentos/")
-              ? "active"
-              : ""
-          }
-        >
-          <Icon name="home" />
-          <span>Visão geral</span>
-        </NavLink>
-        <NavLink to="/caixa">
-          <Icon name="cash" />
-          <span>Caixa</span>
-        </NavLink>
+        {profile === "caixa" ? (
+          <NavLink
+            to="/caixa/vendas"
+            className={() =>
+              pathname === "/caixa/vendas" || pathname === "/" ? "active" : ""
+            }
+          >
+            <Icon name="cash" />
+            <span>Vendas por unidade</span>
+          </NavLink>
+        ) : profile === "compras" ? (
+          <NavLink
+            to="/compras/cmv"
+            className={() =>
+              pathname === "/compras/cmv" || pathname === "/" ? "active" : ""
+            }
+          >
+            <Icon name="document" />
+            <span>Compras / CMV</span>
+          </NavLink>
+        ) : (
+          <>
+            <NavLink
+              to="/"
+              end
+              className={() =>
+                pathname === "/" ||
+                pathname.startsWith("/indicadores/") ||
+                pathname.startsWith("/lancamentos/")
+                  ? "active"
+                  : ""
+              }
+            >
+              <Icon name="home" />
+              <span>Visão geral</span>
+            </NavLink>
+            <NavLink to="/caixa">
+              <Icon name="cash" />
+              <span>Caixa</span>
+            </NavLink>
+          </>
+        )}
         <NavLink to="/mais">
           <Icon name="more" />
           <span>Mais</span>
@@ -121,13 +295,17 @@ export function Back({ to, children }: { to: string; children: ReactNode }) {
 }
 export function Badge({
   kind,
+  example = true,
 }: {
   kind: "observado" | "calculado" | "estimado";
+  example?: boolean;
 }) {
   return (
     <span className={`badge ${kind}`}>
       {kind === "observado"
-        ? "Observado · exemplo"
+        ? example
+          ? "Observado · exemplo"
+          : "Observado · a conferir"
         : kind === "calculado"
           ? "Calculado"
           : "Estimado"}
@@ -135,7 +313,7 @@ export function Badge({
   );
 }
 export function PeriodSelect() {
-  const { period, setPeriod } = useDemo();
+  const { period, setPeriod, scenario } = useDemo();
   return (
     <label className="period-select">
       <span className="eyebrow">PERÍODO DOS INDICADORES</span>
@@ -143,11 +321,13 @@ export function PeriodSelect() {
         value={period}
         onChange={(e) => setPeriod(e.target.value as Period)}
       >
-        {Object.entries(periods).map(([id, label]) => (
-          <option key={id} value={id}>
-            {label}
-          </option>
-        ))}
+        {Object.entries(periods)
+          .filter(([id]) => scenario !== "real" || id === "2026-07")
+          .map(([id, label]) => (
+            <option key={id} value={id}>
+              {label} · {scenario === "real" ? "livro real" : "exemplo"}
+            </option>
+          ))}
       </select>
     </label>
   );
@@ -192,8 +372,35 @@ export function RowLink({
   value?: string;
   color?: string;
 }) {
+  const location = useLocation();
+  const parts = location.pathname.split("/").filter(Boolean);
+  const fields: Record<string, string> = {
+    registrado: "Total registrado no livro",
+    saidas: "Saídas anotadas no caixa",
+    diferenca: "Diferenças anotadas",
+    vendas: "Total de vendas no livro",
+    dinheiro: "Dinheiro",
+    pix: "Pix",
+    debito: "Débito",
+    credito: "Crédito",
+    voucher: "Voucher",
+    ifood: "iFood",
+  };
+  const returnName =
+    parts[0] === "indicadores"
+      ? units.find((u) => u.id === parts[2])?.name ||
+        fields[parts[2]] ||
+        metricNames[parts[1] as Metric] ||
+        "Indicador"
+      : parts[0] === "caixa"
+        ? "Histórico do caixa"
+        : "Visão geral";
   return (
-    <Link className="row-link" to={to}>
+    <Link
+      className="row-link"
+      to={to}
+      state={{ returnTo: location.pathname + location.search, returnName }}
+    >
       {color ? (
         <span className="unit-dot" style={{ background: color }} />
       ) : null}

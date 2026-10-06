@@ -1,0 +1,839 @@
+[
+  {
+    "id": "real-01",
+    "date": "2026-07-01",
+    "page": 132,
+    "file": "IMG_6383.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1h6qHTuwCenZlL7fYuPUVMU2KvfeqKqDW/view?usp=drivesdk",
+    "values": {
+      "pix": 287389,
+      "dinheiro": 268500,
+      "saidas": 165357,
+      "debito": 789800,
+      "credito": 423068,
+      "voucher": 121802,
+      "ifood": 48877,
+      "vendas": 2104793,
+      "registrado": 2084107,
+      "diferenca": 20686
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 943621,
+      "marmita": 165550,
+      "vitrine": 60300
+    },
+    "unitPending": {}
+  },
+  {
+    "id": "real-02",
+    "date": "2026-07-02",
+    "page": 133,
+    "file": "IMG_6384.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1cypJkQz_K8rmUgno-sq8_Uay148uuS0m/view?usp=drivesdk",
+    "values": {
+      "pix": 203884,
+      "dinheiro": 390700,
+      "saidas": 136300,
+      "debito": 775444,
+      "credito": 458839,
+      "voucher": 152418,
+      "ifood": 46882,
+      "vendas": 2164467,
+      "registrado": 2147637,
+      "diferenca": 16830
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 988536,
+      "marmita": 225750,
+      "vitrine": 65300
+    },
+    "unitPending": {}
+  },
+  {
+    "id": "real-03",
+    "date": "2026-07-03",
+    "page": 134,
+    "file": "IMG_6385.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1oKXdklqShmjBeueJaK8cJQygxp-Hi5GS/view?usp=drivesdk",
+    "values": {
+      "pix": 312884,
+      "dinheiro": 259000,
+      "saidas": 167535,
+      "debito": 1000500,
+      "credito": 453692,
+      "voucher": 133769,
+      "ifood": 68621,
+      "vendas": 2396001,
+      "registrado": 2360046,
+      "diferenca": 35955
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 1024104,
+      "marmita": 195650,
+      "vitrine": 79604
+    },
+    "unitPending": {}
+  },
+  {
+    "id": "real-04",
+    "date": "2026-07-04",
+    "page": 135,
+    "file": "IMG_6386.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1tK-bcysFBev2129zyz7IDXn55YFE0mvZ/view?usp=drivesdk",
+    "values": {
+      "pix": 254936,
+      "dinheiro": 281600,
+      "saidas": 166638,
+      "debito": 1211710,
+      "credito": 543915,
+      "voucher": 272936,
+      "ifood": 116274,
+      "vendas": 2848009,
+      "registrado": 2822566,
+      "diferenca": 25443
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 1686402,
+      "marmita": 192000,
+      "vitrine": null
+    },
+    "unitPending": {
+      "vitrine": "sem valor anotado"
+    }
+  },
+  {
+    "id": "real-05",
+    "date": "2026-07-05",
+    "page": 136,
+    "file": "IMG_6387.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1cBhiDrB09mdWjpOwylb9tZA-xp3-b9re/view?usp=drivesdk",
+    "values": {
+      "pix": 219957,
+      "dinheiro": 272700,
+      "saidas": 152938,
+      "debito": 678510,
+      "credito": 485780,
+      "voucher": 117064,
+      "ifood": 174774,
+      "vendas": 2101723,
+      "registrado": 2082920,
+      "diferenca": 18803
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 1061708,
+      "marmita": null,
+      "vitrine": null
+    },
+    "unitPending": {
+      "marmita": "sem valor anotado",
+      "vitrine": "sem valor anotado"
+    }
+  },
+  {
+    "id": "real-06",
+    "date": "2026-07-06",
+    "page": 137,
+    "file": "IMG_6388.heic",
+    "sourceUrl": "https://drive.google.com/file/d/14OgmIKaTnWHgGx5IzhJiq1MoxnLx_2Xm/view?usp=drivesdk",
+    "values": {
+      "pix": 289917,
+      "dinheiro": 405400,
+      "saidas": 197994,
+      "debito": 725360,
+      "credito": 355108,
+      "voucher": 124806,
+      "ifood": 55673,
+      "vendas": 2154258,
+      "registrado": 2138386,
+      "diferenca": 15872
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 1238276,
+      "marmita": 148350,
+      "vitrine": 87470
+    },
+    "unitPending": {}
+  },
+  {
+    "id": "real-07",
+    "date": "2026-07-07",
+    "page": 138,
+    "file": "IMG_6389.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1PR0WbkUpk06UEvgfk3Guy_Tb-qN5R-n-/view?usp=drivesdk",
+    "values": {
+      "pix": 170937,
+      "dinheiro": 395500,
+      "saidas": 95568,
+      "debito": 801823,
+      "credito": 350310,
+      "voucher": 70496,
+      "ifood": 86281,
+      "vendas": 1970915,
+      "registrado": 1942034,
+      "diferenca": 28881
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 938241,
+      "marmita": 204250,
+      "vitrine": 47330
+    },
+    "unitPending": {}
+  },
+  {
+    "id": "real-08",
+    "date": "2026-07-08",
+    "page": 139,
+    "file": "IMG_6390.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1-364NhPmuPq5XbK29DW5S6yyhQApWITQ/view?usp=drivesdk",
+    "values": {
+      "pix": 266937,
+      "dinheiro": 304000,
+      "saidas": 132630,
+      "debito": 1038373,
+      "credito": 463113,
+      "voucher": 150431,
+      "ifood": 50078,
+      "vendas": 2405562,
+      "registrado": 2365587,
+      "diferenca": 39975
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 1068638,
+      "marmita": 205400,
+      "vitrine": 82110
+    },
+    "unitPending": {}
+  },
+  {
+    "id": "real-09",
+    "date": "2026-07-09",
+    "page": 140,
+    "file": "IMG_6391.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1RDhR7Pesx4Z5_jFSbOe6lw87OUqNof0X/view?usp=drivesdk",
+    "values": {
+      "pix": 255752,
+      "dinheiro": 204600,
+      "saidas": 206232,
+      "debito": 805827,
+      "credito": 487788,
+      "voucher": 127883,
+      "ifood": 156708,
+      "vendas": 2244790,
+      "registrado": 2206897,
+      "diferenca": 37893
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 1355755,
+      "marmita": 170400,
+      "vitrine": null
+    },
+    "unitPending": {
+      "vitrine": "sem valor anotado"
+    }
+  },
+  {
+    "id": "real-10",
+    "date": "2026-07-10",
+    "page": 141,
+    "file": "IMG_6392.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1GoY1FOMOX8Qw9WvsUviSQ4rqUnBdr8c0/view?usp=drivesdk",
+    "values": {
+      "pix": 248354,
+      "dinheiro": 412400,
+      "saidas": 122812,
+      "debito": 1085655,
+      "credito": 527528,
+      "voucher": 116411,
+      "ifood": 102662,
+      "vendas": 2615822,
+      "registrado": 2617264,
+      "diferenca": -1442
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": null,
+      "marmita": 245750,
+      "vitrine": 70470
+    },
+    "unitPending": {
+      "buffet": "desfoque"
+    }
+  },
+  {
+    "id": "real-11",
+    "date": "2026-07-11",
+    "page": 142,
+    "file": "IMG_6393.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1nQOE8orXDzOyOphfMz9M2N1hSSky1Wp9/view?usp=drivesdk",
+    "values": {
+      "pix": 305537,
+      "dinheiro": 15000,
+      "saidas": 433878,
+      "debito": 1211691,
+      "credito": 706182,
+      "voucher": 184666,
+      "ifood": 52939,
+      "vendas": 2909893,
+      "registrado": 2867180,
+      "diferenca": 42713
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 1595751,
+      "marmita": 187200,
+      "vitrine": null
+    },
+    "unitPending": {
+      "vitrine": "sem valor anotado"
+    }
+  },
+  {
+    "id": "real-12",
+    "date": "2026-07-12",
+    "page": 143,
+    "file": "IMG_6394.heic",
+    "sourceUrl": "https://drive.google.com/file/d/18NCbXBQSmmytW0i2bQ-2Z7B38Mvk4-_c/view?usp=drivesdk",
+    "values": {
+      "pix": 206821,
+      "dinheiro": 267200,
+      "saidas": 128276,
+      "debito": 731932,
+      "credito": 457907,
+      "voucher": 123984,
+      "ifood": 303213,
+      "vendas": 2219333,
+      "registrado": 2203666,
+      "diferenca": 15667
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 1261732,
+      "marmita": null,
+      "vitrine": null
+    },
+    "unitPending": {
+      "marmita": "sem valor anotado",
+      "vitrine": "sem valor anotado"
+    }
+  },
+  {
+    "id": "real-13",
+    "date": "2026-07-13",
+    "page": 144,
+    "file": "IMG_6395.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1U_u4ZUrtfYnPn39Nz6DrwtLdFaL6X2ZX/view?usp=drivesdk",
+    "values": {
+      "pix": 234926,
+      "dinheiro": 0,
+      "saidas": 350981,
+      "debito": 532050,
+      "credito": 347143,
+      "voucher": 90350,
+      "ifood": 93319,
+      "vendas": 1648769,
+      "registrado": 1627636,
+      "diferenca": 21133
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 528814,
+      "marmita": 146200,
+      "vitrine": 294000
+    },
+    "unitPending": {}
+  },
+  {
+    "id": "real-14",
+    "date": "2026-07-14",
+    "page": 145,
+    "file": "IMG_6396.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1_iNtBIoycI2WxdU7CruamtR-VSyviQRl/view?usp=drivesdk",
+    "values": {
+      "pix": 202209,
+      "dinheiro": 507000,
+      "saidas": 229395,
+      "debito": 694549,
+      "credito": 387483,
+      "voucher": 84663,
+      "ifood": 12667,
+      "vendas": 2117966,
+      "registrado": 2096568,
+      "diferenca": 21398
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 1234792,
+      "marmita": 146200,
+      "vitrine": 62460
+    },
+    "unitPending": {}
+  },
+  {
+    "id": "real-15",
+    "date": "2026-07-15",
+    "page": 146,
+    "file": "IMG_6397.heic",
+    "sourceUrl": "https://drive.google.com/file/d/16W11-kiL6TilZFXYXllIHNppZSddLchb/view?usp=drivesdk",
+    "values": {
+      "pix": 293229,
+      "dinheiro": 214200,
+      "saidas": 184819,
+      "debito": 704187,
+      "credito": 484566,
+      "voucher": 88688,
+      "ifood": 74766,
+      "vendas": 2044455,
+      "registrado": 2014840,
+      "diferenca": 29615
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 1094824,
+      "marmita": 167700,
+      "vitrine": 90220
+    },
+    "unitPending": {}
+  },
+  {
+    "id": "real-16",
+    "date": "2026-07-16",
+    "page": 147,
+    "file": "IMG_6398.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1qPU2YZbyghvaZmNE258oUubgq_BPitkr/view?usp=drivesdk",
+    "values": {
+      "pix": 265051,
+      "dinheiro": 234500,
+      "saidas": 182904,
+      "debito": 696592,
+      "credito": 523532,
+      "voucher": 73317,
+      "ifood": 91017,
+      "vendas": 2066913,
+      "registrado": 2038956,
+      "diferenca": 27957
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 1051078,
+      "marmita": 169850,
+      "vitrine": 102350
+    },
+    "unitPending": {}
+  },
+  {
+    "id": "real-17",
+    "date": "2026-07-17",
+    "page": 148,
+    "file": "IMG_6399.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1ieRoGmjtp_Dk32VNsKQmiFDBHRr0EPOK/view?usp=drivesdk",
+    "values": {
+      "pix": 255323,
+      "dinheiro": 127200,
+      "saidas": 289237,
+      "debito": 721237,
+      "credito": 634235,
+      "voucher": 120155,
+      "ifood": 41930,
+      "vendas": 2189317,
+      "registrado": 2192766,
+      "diferenca": -3449
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 1061842,
+      "marmita": 172000,
+      "vitrine": 96970
+    },
+    "unitPending": {}
+  },
+  {
+    "id": "real-18",
+    "date": "2026-07-18",
+    "page": 149,
+    "file": "IMG_6400.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1G9IynAS8lRIxEta0gWyVsG7wxB12uT2E/view?usp=drivesdk",
+    "values": {
+      "pix": 214712,
+      "dinheiro": 46500,
+      "saidas": 426337,
+      "debito": 1023093,
+      "credito": 619685,
+      "voucher": 153316,
+      "ifood": 154311,
+      "vendas": 2647954,
+      "registrado": 2611861,
+      "diferenca": 36093
+    },
+    "note": "A soma dos recebimentos + saídas fica R$ 100,00 abaixo do total de vendas anotado. Conferir o livro; valores preservados.",
+    "unitValues": {
+      "buffet": 1366027,
+      "marmita": 151200,
+      "vitrine": null
+    },
+    "unitPending": {
+      "vitrine": "sem valor anotado"
+    }
+  },
+  {
+    "id": "real-19",
+    "date": "2026-07-19",
+    "page": 150,
+    "file": "IMG_6401.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1YJHB0oubFkWu3xgPlGka4Y7S85vZ2UN7/view?usp=drivesdk",
+    "values": {
+      "pix": 149494,
+      "dinheiro": 245000,
+      "saidas": 167100,
+      "debito": 856933,
+      "credito": 407010,
+      "voucher": 14889,
+      "ifood": 199639,
+      "vendas": 2040065,
+      "registrado": 1986808,
+      "diferenca": 53257
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 1170577,
+      "marmita": null,
+      "vitrine": null
+    },
+    "unitPending": {
+      "marmita": "sem valor anotado",
+      "vitrine": "sem valor anotado"
+    }
+  },
+  {
+    "id": "real-20",
+    "date": "2026-07-20",
+    "page": 151,
+    "file": "IMG_6402.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1ug6DWUtmx-WI0UYOeMTs-2yxbh-8g8M2/view?usp=drivesdk",
+    "values": {
+      "pix": 272462,
+      "dinheiro": 34800,
+      "saidas": 267320,
+      "debito": 649384,
+      "credito": 362116,
+      "voucher": 91822,
+      "ifood": 54999,
+      "vendas": 1732903,
+      "registrado": 1718980,
+      "diferenca": 13923
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 769065,
+      "marmita": 137600,
+      "vitrine": 95890
+    },
+    "unitPending": {}
+  },
+  {
+    "id": "real-21",
+    "date": "2026-07-21",
+    "page": 152,
+    "file": "IMG_6403.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1SR6LNLle7EIi0gW40DK_GvuZ8XwEmX77/view?usp=drivesdk",
+    "values": {
+      "pix": 189969,
+      "dinheiro": 119500,
+      "saidas": 224279,
+      "debito": 843869,
+      "credito": 277218,
+      "voucher": 66625,
+      "ifood": 60489,
+      "vendas": 1781949,
+      "registrado": 1787520,
+      "diferenca": -5571
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 832507,
+      "marmita": 150500,
+      "vitrine": 61940
+    },
+    "unitPending": {}
+  },
+  {
+    "id": "real-22",
+    "date": "2026-07-22",
+    "page": 153,
+    "file": "IMG_6404.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1jSFbeFgpcv3PFwuCShOClqrSS0Sh-_aA/view?usp=drivesdk",
+    "values": {
+      "pix": 240206,
+      "dinheiro": 117200,
+      "saidas": 229285,
+      "debito": 746506,
+      "credito": 343892,
+      "voucher": 50357,
+      "ifood": 28392,
+      "vendas": 1755838,
+      "registrado": 1753658,
+      "diferenca": 2180
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 690745,
+      "marmita": 148350,
+      "vitrine": 59490
+    },
+    "unitPending": {}
+  },
+  {
+    "id": "real-23",
+    "date": "2026-07-23",
+    "page": 154,
+    "file": "IMG_6405.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1HcP0cDp4npn51Vqf6MjYqG6qeKmNyCj4/view?usp=drivesdk",
+    "values": {
+      "pix": 234803,
+      "dinheiro": 161700,
+      "saidas": 216296,
+      "debito": 542337,
+      "credito": 371320,
+      "voucher": 66488,
+      "ifood": 51085,
+      "vendas": 1644029,
+      "registrado": 1595562,
+      "diferenca": 48467
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 702225,
+      "marmita": 169850,
+      "vitrine": 76290
+    },
+    "unitPending": {}
+  },
+  {
+    "id": "real-24",
+    "date": "2026-07-24",
+    "page": 155,
+    "file": "IMG_6406.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1P38ye5J0oNATWhKnL2FGttUGgiLU9n-1/view?usp=drivesdk",
+    "values": {
+      "pix": 252143,
+      "dinheiro": 218500,
+      "saidas": 127900,
+      "debito": 634731,
+      "credito": 531406,
+      "voucher": 66500,
+      "ifood": 78623,
+      "vendas": 1909803,
+      "registrado": 1860397,
+      "diferenca": 49406
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 688445,
+      "marmita": 187050,
+      "vitrine": 68290
+    },
+    "unitPending": {}
+  },
+  {
+    "id": "real-25",
+    "date": "2026-07-25",
+    "page": 156,
+    "file": "IMG_6407.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1yEv6gZbwoWh7q7NbA9WXnCCMB_9C_slH/view?usp=drivesdk",
+    "values": {
+      "pix": 276724,
+      "dinheiro": 69600,
+      "saidas": 340798,
+      "debito": 1032280,
+      "credito": 529089,
+      "voucher": 158505,
+      "ifood": 112459,
+      "vendas": 2519505,
+      "registrado": null,
+      "diferenca": 56287
+    },
+    "note": "Total registrado rasurado: não transcrito. Soma dos recebimentos + saídas difere das vendas em R$ 0,50. Conferir a página.",
+    "unitValues": {
+      "buffet": 1304377,
+      "marmita": 194400,
+      "vitrine": null
+    },
+    "unitPending": {
+      "vitrine": "sem valor anotado"
+    }
+  },
+  {
+    "id": "real-26",
+    "date": "2026-07-26",
+    "page": 157,
+    "file": "IMG_6408.heic",
+    "sourceUrl": "https://drive.google.com/file/d/17zABZOCP9EgjTvtolp0Y-cD12_bpcV_H/view?usp=drivesdk",
+    "values": {
+      "pix": 134901,
+      "dinheiro": 268400,
+      "saidas": 128300,
+      "debito": 740243,
+      "credito": 429340,
+      "voucher": 49044,
+      "ifood": 227411,
+      "vendas": 1977639,
+      "registrado": 1953399,
+      "diferenca": 24240
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 1174604,
+      "marmita": null,
+      "vitrine": null
+    },
+    "unitPending": {
+      "marmita": "sem valor anotado",
+      "vitrine": "sem valor anotado"
+    }
+  },
+  {
+    "id": "real-27",
+    "date": "2026-07-27",
+    "page": 158,
+    "file": "IMG_6409.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1ibkdSx3N-PIF5mDKzXjTMdhQNaMhA2rg/view?usp=drivesdk",
+    "values": {
+      "pix": 288831,
+      "dinheiro": 54700,
+      "saidas": 338687,
+      "debito": 677843,
+      "credito": 376562,
+      "voucher": 83941,
+      "ifood": 46496,
+      "vendas": 1867060,
+      "registrado": 1839324,
+      "diferenca": 27736
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 954862,
+      "marmita": 116100,
+      "vitrine": 79570
+    },
+    "unitPending": {}
+  },
+  {
+    "id": "real-28",
+    "date": "2026-07-28",
+    "page": 159,
+    "file": "IMG_6410.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1NBctRpnCBkNtCJODCL-LRnhOkaetWBcL/view?usp=drivesdk",
+    "values": {
+      "pix": 234061,
+      "dinheiro": 285700,
+      "saidas": 106524,
+      "debito": 620998,
+      "credito": 358763,
+      "voucher": 39200,
+      "ifood": 27693,
+      "vendas": 1672939,
+      "registrado": 1671646,
+      "diferenca": 1293
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": null,
+      "marmita": null,
+      "vitrine": 46720
+    },
+    "unitPending": {
+      "buffet": "desfoque",
+      "marmita": "desfoque"
+    }
+  },
+  {
+    "id": "real-29",
+    "date": "2026-07-29",
+    "page": 160,
+    "file": "IMG_6411.heic",
+    "sourceUrl": "https://drive.google.com/file/d/15tn-FzODdbV-FGNLrpV7Jcefj1ctAPZe/view?usp=drivesdk",
+    "values": {
+      "pix": null,
+      "dinheiro": null,
+      "saidas": null,
+      "debito": null,
+      "credito": null,
+      "voucher": null,
+      "ifood": null,
+      "vendas": 1574023,
+      "registrado": 1565808,
+      "diferenca": 8215
+    },
+    "note": "Foto com desfoque: recebimentos e saídas aguardam confirmação. Totais de vendas, registrado e diferença foram transcritos.",
+    "unitValues": {
+      "buffet": null,
+      "marmita": null,
+      "vitrine": null
+    },
+    "unitPending": {
+      "buffet": "desfoque",
+      "marmita": "desfoque",
+      "vitrine": "desfoque"
+    }
+  },
+  {
+    "id": "real-30",
+    "date": "2026-07-30",
+    "page": 161,
+    "file": "IMG_6412.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1D_GT3WM1919aHrVAVBCMholmWsK21Wes/view?usp=drivesdk",
+    "values": {
+      "pix": 212833,
+      "dinheiro": 269000,
+      "saidas": 111800,
+      "debito": 717195,
+      "credito": 318319,
+      "voucher": 50632,
+      "ifood": 59235,
+      "vendas": 1739014,
+      "registrado": 1721003,
+      "diferenca": 18011
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 753784,
+      "marmita": 159100,
+      "vitrine": 86040
+    },
+    "unitPending": {}
+  },
+  {
+    "id": "real-31",
+    "date": "2026-07-31",
+    "page": 162,
+    "file": "IMG_6413.heic",
+    "sourceUrl": "https://drive.google.com/file/d/1GZ8GwjVHL-8N9xy1tsGIojROlNY9Nn-D/view?usp=drivesdk",
+    "values": {
+      "pix": 254547,
+      "dinheiro": 375000,
+      "saidas": 172141,
+      "debito": 774418,
+      "credito": 486921,
+      "voucher": 173104,
+      "ifood": 62243,
+      "vendas": 2298374,
+      "registrado": 2265164,
+      "diferenca": 33210
+    },
+    "note": "",
+    "unitValues": {
+      "buffet": 1067381,
+      "marmita": 180600,
+      "vitrine": 86090
+    },
+    "unitPending": {}
+  }
+]

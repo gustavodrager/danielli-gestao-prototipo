@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { useDemo } from "./demo-context";
 import {
   dateLabel,
@@ -11,10 +11,12 @@ import {
   type Metric,
 } from "./data";
 import { Back, Badge, Empty, Icon, Note, PeriodSelect, RowLink } from "./ui";
+import { RealIndicator } from "./Real";
 const metrics = Object.keys(metricNames);
 export function Indicator() {
   const { tipo = "", grupo, origem } = useParams();
-  const { entries, period } = useDemo();
+  const { entries, period, scenario } = useDemo();
+  if (scenario === "real") return <RealIndicator />;
   const t = totals(entries);
   const calculated = tipo === "resultado" || tipo === "prime-cost";
   if (!metrics.includes(tipo) && !calculated)
@@ -35,6 +37,10 @@ export function Indicator() {
       (!grupo || e.group === grupo) &&
       (!origem || e.source === origem),
   );
+  const showEntries =
+    !!origem ||
+    tipo === "pessoal" ||
+    (!!grupo && new Set(list.map((e) => e.source)).size === 1);
   const heading = origem
     ? list[0]?.sourceName
     : grupo
@@ -52,18 +58,18 @@ export function Indicator() {
   return (
     <>
       <Back to={parent}>
-        {origem ? "Categoria / unidade" : grupo ? name : "Visão geral"}
+        {origem ? list[0]?.groupName || name : grupo ? name : "Visão geral"}
       </Back>
       <div className="breadcrumbs" aria-label="Caminho do detalhamento">
         Resumo <span>›</span> Composição{" "}
         {grupo ? (
           <>
-            <span>›</span> Categoria / unidade
+            <span>›</span> {list[0]?.groupName}
           </>
         ) : null}
         {origem ? (
           <>
-            <span>›</span> Origem
+            <span>›</span> {list[0]?.sourceName}
           </>
         ) : null}
       </div>
@@ -79,23 +85,30 @@ export function Indicator() {
       ) : (
         <>
           <section className="detail-hero">
-            <span className="eyebrow">{periods[period]}</span>
+            <span className="eyebrow">
+              {heading || name} · {periods[period]}
+            </span>
             <strong>{value}</strong>
             <Badge kind={calculated ? "estimado" : "calculado"} />
             {tipo === "cmv" ? (
               <span>
-                {percent(t.cmvPercent!)} do faturamento · aproximação por
-                compras
+                {t.revenue
+                  ? percent((sum(list.map((e) => e.amount)) / t.revenue) * 100)
+                  : "—"}{" "}
+                do faturamento geral · compras deste recorte
               </span>
             ) : null}
           </section>
           {tipo === "cmv" ? (
-            <Note tone="warning">
-              <b>Compras observadas; CMV estimado.</b> O valor soma os
-              documentos fictícios de compra. Estoques e consumo não estão
-              disponíveis. Categorias ilustram o acompanhamento atual e não
-              rateiam custos entre unidades.
-            </Note>
+            <details className="panel">
+              <summary>Como este número foi formado</summary>
+              <Note tone="warning">
+                <b>Soma calculada de compras; aproximação estimada de CMV.</b> O
+                valor soma os documentos fictícios de compra. Estoques e consumo
+                não estão disponíveis. Categorias ilustram o acompanhamento
+                atual e não rateiam custos entre unidades.
+              </Note>
+            </details>
           ) : null}
           {tipo === "despesas" || tipo === "pessoal" ? (
             <Note>
@@ -153,7 +166,7 @@ export function Indicator() {
           ) : (
             <>
               <h2>
-                {origem
+                {showEntries
                   ? "Lançamentos de exemplo"
                   : grupo
                     ? "Fornecedor / origem"
@@ -162,7 +175,7 @@ export function Indicator() {
                       : "Composição por categoria"}
               </h2>
               <div className="panel compact">
-                {origem
+                {showEntries
                   ? list.map((e) => (
                       <RowLink
                         key={e.id}
@@ -207,6 +220,7 @@ export function Indicator() {
 }
 export function EntryDetail() {
   const { id } = useParams();
+  const location = useLocation();
   const { entries } = useDemo();
   const entry = entries.find((e) => e.id === id);
   if (!entry)
@@ -220,7 +234,9 @@ export function EntryDetail() {
   const back = `/indicadores/${entry.metric}/${entry.group}/origens/${entry.source}`;
   return (
     <>
-      <Back to={back}>Lançamentos</Back>
+      <Back to={location.state?.returnTo || back}>
+        {location.state?.returnName || "Lançamentos"}
+      </Back>
       <span className="eyebrow">RASTREABILIDADE · EXEMPLO</span>
       <h1>{entry.document}</h1>
       <section className="detail-hero">

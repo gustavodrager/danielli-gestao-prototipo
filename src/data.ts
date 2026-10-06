@@ -20,7 +20,7 @@ export const methods = [
 ] as const;
 export type Metric = "faturamento" | "cmv" | "despesas" | "pessoal";
 export type Period = "2026-09" | "2026-08" | "2026-07";
-export type Scenario = "regular" | "diferenca" | "vazio";
+export type Scenario = "real" | "regular" | "diferenca" | "vazio";
 export const periods: Record<Period, string> = {
   "2026-09": "Setembro 2026",
   "2026-08": "Agosto 2026",
@@ -164,6 +164,7 @@ export const entries: Entry[] = groups.flatMap((g) =>
   })),
 );
 export function periodEntries(period: Period, scenario: Scenario) {
+  if (scenario === "real") return [];
   if (period === "2026-07" || scenario === "vazio") return [];
   if (period === "2026-09") return entries;
   return entries.map((e) => ({
@@ -206,6 +207,7 @@ export const trend = [
   { label: "Set", value: totals(entries).revenue },
 ];
 export interface CashDraft {
+  localId?: string;
   date: string;
   responsible: string;
   reviewer: string;
@@ -217,7 +219,9 @@ export interface CashDraft {
 }
 export function emptyDraft(): CashDraft {
   return {
-    date: "2026-10-05",
+    date: new Date().toLocaleDateString("sv-SE", {
+      timeZone: "America/Sao_Paulo",
+    }),
     responsible: "",
     reviewer: "",
     sales: "",
@@ -267,7 +271,7 @@ export function exampleDraft(scenario: Scenario): CashDraft {
 // Converte reais para centavos antes de somar: evita diferenças por ponto flutuante.
 export function cents(value: string): number | null {
   const cleaned = value.trim().replace(/^R\$\s*/, "");
-  if (!cleaned) return 0;
+  if (!cleaned) return value.trim() ? null : 0;
   if (
     cleaned.includes(",") &&
     !/^(?:\d+|\d{1,3}(?:\.\d{3})+)(?:,\d{1,2})?$/.test(cleaned)
@@ -282,12 +286,33 @@ export function cents(value: string): number | null {
   const amount = Math.round(Number(normalized) * 100);
   return Number.isSafeInteger(amount) && amount <= 99999999999 ? amount : null;
 }
+export function observedCents(value: string): number | null {
+  return value.trim() ? cents(value) : null;
+}
 export function cashTotals(draft: CashDraft) {
   const receipts = sum(Object.values(draft.receipts).map((v) => cents(v) ?? 0));
   const sales = cents(draft.sales) ?? 0;
   const mix = sum(Object.values(draft.units).map((v) => cents(v) ?? 0));
   const outflows = sum(draft.outflows.map((o) => cents(o.amount) ?? 0));
-  return { receipts, sales, mix, outflows, difference: receipts - sales };
+  const receiptCount = Object.values(draft.receipts).filter(
+    (v) => observedCents(v) !== null,
+  ).length;
+  const unitCount = Object.values(draft.units).filter(
+    (v) => observedCents(v) !== null,
+  ).length;
+  const difference =
+    receiptCount === methods.length && observedCents(draft.sales) !== null
+      ? receipts - sales
+      : null;
+  return {
+    receipts,
+    sales,
+    mix,
+    outflows,
+    receiptCount,
+    unitCount,
+    difference,
+  };
 }
 export function cashErrors(draft: CashDraft): string[] {
   const errors: string[] = [];

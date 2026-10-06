@@ -41,6 +41,46 @@ function passed(name) {
 }
 run("set", "viewport", "390", "844");
 open("/");
+for (const [unit, name, original, amount, days] of [
+  ["buffet", "Buffet", "Almoço", "296.087,13", 28],
+  ["marmita", "Marmita", "Marmitex", "43.370,00", 25],
+  ["vitrine", "Vitrine", "Lojista", "17.989,04", 21],
+]) {
+  run("click", `a[href="/indicadores/faturamento/${unit}"]`);
+  snapshot();
+  check(
+    `document.querySelector('h1').innerText === '${name}' && document.body.innerText.includes('${original}') && document.body.innerText.includes('${amount}') && document.body.innerText.includes('${days}/31 DIAS')`,
+  );
+  click("link", "01/07/2026");
+  check(
+    "document.body.innerText.includes('Buffet') && document.body.innerText.includes('Marmita') && document.body.innerText.includes('Vitrine') && document.body.innerText.includes('9.436,21')",
+  );
+  click("link", "Visão geral");
+}
+passed(
+  "Origens confirmadas: subtotais por unidade, cobertura, dias e nomes originais",
+);
+check(
+  "document.body.innerText.includes('653.640,81') && document.body.innerText.includes('HISTÓRICO REAL')",
+);
+check(
+  "document.body.innerText.includes('CMV + Pessoal') && !document.body.innerText.includes('54.960,00')",
+);
+run("click", 'a[href="/indicadores/faturamento"]');
+snapshot();
+click("link", "25/07/2026");
+check(
+  "document.body.innerText.includes('rasurado') && document.body.innerText.includes('A conferir')",
+);
+check(
+  "document.querySelector('a[href^=\"https://drive.google.com/file/d/\"]') !== null",
+);
+run("screenshot", "artifacts/livro-real-mobile.png", "--full");
+click("link", "Mais");
+run("find", "label", "Operação regular · fictícia", "check");
+snapshot();
+click("link", "Explorar visão geral");
+passed("Histórico real: 31 dias, fontes, pendências e separação dos exemplos");
 check("document.body.innerText.includes('184.320,00')");
 check("scrollY === 0");
 run("select", "select", "2026-08");
@@ -146,6 +186,10 @@ for (const width of [320, 375, 390, 430, 1024]) {
   for (const path of [
     "/",
     "/indicadores/faturamento",
+    "/indicadores/faturamento/buffet",
+    "/indicadores/faturamento/marmita",
+    "/indicadores/faturamento/vitrine",
+    "/caixa/historico/real-01",
     "/indicadores/cmv",
     "/indicadores/resultado",
     "/indicadores/prime-cost",
@@ -164,7 +208,7 @@ for (const width of [320, 375, 390, 430, 1024]) {
   open("/");
   run("screenshot", `artifacts/dashboard-${width}.png`, "--full");
 }
-passed("Sem overflow horizontal em 12 rotas × 5 larguras (320–1024 px)");
+passed("Sem overflow horizontal em 16 rotas × 5 larguras (320–1024 px)");
 run("set", "viewport", "390", "844");
 for (const path of ["/", "/caixa/novo", "/mais"]) {
   open(path);
