@@ -1,21 +1,44 @@
+import { useSearchParams } from "react-router-dom";
+import { availableMonths, currentMonth, type Period } from "./months";
 import { createContext, useContext, useState, type ReactNode } from "react";
 import {
   emptyDraft,
   periodEntries,
   type CashDraft,
-  type Period,
   type Scenario,
 } from "./data";
-import { emptyUnitSales, type UnitSalesRecord } from "./unit-sales";
+import {
+  paymentMethods,
+  emptyUnitSales,
+  emptyRates,
+  ratesToDraft,
+  upgradeUnitSalesDraft,
+  type FeeDraft,
+  type UnitSalesRecord,
+} from "./unit-sales";
 import { type PrototypeProfile } from "./prototype-views";
 import { emptyPurchase, type PurchaseRecord } from "./purchase-input";
 import { useLocalState, upsertByDate } from "./local-state";
 function useDemoState() {
-  const [period, setPeriod] = useState<Period>("2026-07");
-  const [scenario, setScenarioState] = useState<Scenario>("real");
+  const [params, setParams] = useSearchParams();
+  const requested = params.get("mes") as Period | null;
+  const period =
+    requested && availableMonths().includes(requested)
+      ? requested
+      : currentMonth();
+  const setPeriod = (next: Period) => {
+    setParams((current) => {
+      const updated = new URLSearchParams(current);
+      updated.set("mes", next);
+      for (const key of ["dia", "busca", "pendencias"]) updated.delete(key);
+      return updated;
+    });
+  };
+  const [scenarioMode, setScenarioState] = useState<Scenario>("regular");
+  const scenario: Scenario = period === "2026-07" ? "real" : scenarioMode;
   const setScenario = (next: Scenario) => {
-    setScenarioState(next);
-    setPeriod(next === "real" ? "2026-07" : "2026-09");
+    setScenarioState(next === "real" ? "regular" : next);
+    if (next === "real") setPeriod("2026-07");
   };
   const [draft, setDraft, cashSaved] = useLocalState<CashDraft>(
     "cash-draft",
@@ -32,9 +55,14 @@ function useDemoState() {
         ? "compras"
         : "gestor",
   );
+  const [feeRates, setFeeRates, ratesSaved] = useLocalState<FeeDraft>(
+    "fee-rates",
+    emptyRates,
+  );
   const [unitSalesDraft, setUnitSalesDraft, salesSaved] = useLocalState(
     "sales-draft",
-    emptyUnitSales,
+    () => emptyUnitSales(feeRates),
+    upgradeUnitSalesDraft,
   );
   const [unitSalesRecord, setUnitSalesRecordState, salesRecordSaved] =
     useLocalState<UnitSalesRecord | null>("sales-record", null);
@@ -54,6 +82,7 @@ function useDemoState() {
   const setUnitSalesRecord = (unitSalesRecord: UnitSalesRecord | null) => {
     setUnitSalesRecordState(unitSalesRecord);
     if (!unitSalesRecord) return;
+    if (unitSalesRecord.rates) setFeeRates(ratesToDraft(unitSalesRecord.rates));
     setUnitSalesRecords((current) => upsertByDate(current, unitSalesRecord));
     setDraft((current) =>
       current.date === unitSalesRecord.date
@@ -62,7 +91,16 @@ function useDemoState() {
             units: Object.fromEntries(
               Object.entries(unitSalesRecord.values).map(([id, v]) => [
                 id,
-                v === null ? "" : (v / 100).toFixed(2),
+                v === null ||
+                (unitSalesRecord.receipts &&
+                  paymentMethods.some(
+                    (m) =>
+                      unitSalesRecord.receipts![
+                        id as keyof typeof unitSalesRecord.receipts
+                      ][m.id] === null,
+                  ))
+                  ? ""
+                  : (v / 100).toFixed(2),
               ]),
             ),
           }
@@ -75,6 +113,7 @@ function useDemoState() {
       setPurchaseRecords((current) => upsertByDate(current, purchaseRecord));
   };
   return {
+    feeRates,
     unitSalesRecords,
     setUnitSalesRecords,
     purchaseRecords,
@@ -82,6 +121,7 @@ function useDemoState() {
     cashRecords,
     setCashRecords,
     localSaved:
+      ratesSaved &&
       cashSaved &&
       salesSaved &&
       purchaseSaved &&
@@ -105,6 +145,7 @@ function useDemoState() {
     setUnitSalesDraft,
     unitSalesRecord,
     setUnitSalesRecord,
+    selectUnitSalesRecord: setUnitSalesRecordState,
     purchaseDraft,
     setPurchaseDraft,
     purchaseRecord,

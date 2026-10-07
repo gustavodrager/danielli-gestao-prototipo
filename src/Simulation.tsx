@@ -1,8 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link } from "./navigation";
 import { useDemo } from "./demo-context";
 import { dateLabel, money, units } from "./data";
-import { Back, Badge, Note } from "./ui";
-import type { UnitSalesDraft } from "./unit-sales";
+import { Icon, Badge, Note } from "./ui";
+import { recordToDraft } from "./unit-sales";
 import { useState } from "react";
 export default function Simulation() {
   const {
@@ -11,7 +11,7 @@ export default function Simulation() {
     cashRecords,
     setProfile,
     setUnitSalesDraft,
-    setUnitSalesRecord,
+    selectUnitSalesRecord,
     setPurchaseDraft,
     setPurchaseRecord,
   } = useDemo();
@@ -26,7 +26,10 @@ export default function Simulation() {
   const sumPurchases = purchases.reduce((n, r) => n + r.amount, 0);
   return (
     <>
-      <Back to="/">Visão gerencial</Back>
+      <Link className="back" to="/" onClick={() => setProfile("gestor")}>
+        <Icon name="back" size={17} />
+        Visão gerencial
+      </Link>
       <h1>Registros da simulação</h1>
       <Note>
         Dados digitados nesta aba, separados do histórico real e dos exemplos
@@ -37,18 +40,19 @@ export default function Simulation() {
         <input
           type="month"
           value={month}
-          onChange={(e) => setMonth(e.target.value)}
+          onInput={(e) => setMonth(e.currentTarget.value)}
         />
       </label>
       <section className="detail-hero">
-        <span>Vendas informadas · {month}</span>
+        <span>Vendas brutas informadas · {month}</span>
         <strong>
           {sales.length ? money(sumSales / 100) : "Não informado"}
         </strong>
         <Badge kind="calculado" />
         <span>
-          {sales.length} dias · {sales.filter((r) => r.count === 6).length} com
-          seis unidades · cobertura dos dias do mês não confirmada
+          {sales.length} dias ·{" "}
+          {sales.filter((r) => r.completeCount === 6).length} com recebimentos
+          completos nas seis unidades · cobertura dos dias do mês não confirmada
         </span>
       </section>
       <details className="panel">
@@ -81,22 +85,45 @@ export default function Simulation() {
             to="/caixa/vendas"
             onClick={() => {
               setProfile("caixa");
-              setUnitSalesRecord(null);
-              setUnitSalesDraft({
-                date: r.date,
-                values: Object.fromEntries(
-                  Object.entries(r.values).map(([id, v]) => [
-                    id,
-                    v === null ? "" : (v / 100).toFixed(2),
-                  ]),
-                ) as UnitSalesDraft["values"],
-              });
+              selectUnitSalesRecord(r);
+              setUnitSalesDraft(recordToDraft(r));
             }}
           >
-            {dateLabel(r.date)} · {r.count}/6 · {money(r.total / 100)} · Editar
+            {dateLabel(r.date)} · {money(r.total / 100)} bruto ·{" "}
+            {r.receipts
+              ? `${r.completeCount ?? 0}/6 completas · Conferir / editar`
+              : "Sem detalhamento por recebimento"}
           </Link>
         ))}
       </details>
+      <section className="panel">
+        <h2>Taxas e líquido dos registros locais</h2>
+        <div className="summary-row">
+          <span>Taxas conhecidas</span>
+          <b>
+            {sales.some((r) => r.partialFees != null)
+              ? money(sales.reduce((n, r) => n + (r.partialFees ?? 0), 0) / 100)
+              : "A conferir"}
+          </b>
+        </div>
+        <div className="summary-row">
+          <span>
+            {sales.length && sales.every((r) => r.netTotal != null)
+              ? "Líquido após taxas"
+              : "Líquido parcial · unidades calculáveis"}
+          </span>
+          <b>
+            {sales.some((r) => r.partialNet != null)
+              ? money(sales.reduce((n, r) => n + (r.partialNet ?? 0), 0) / 100)
+              : "A conferir"}
+          </b>
+        </div>
+        <p className="hint">
+          {sales.reduce((n, r) => n + (r.netCount ?? 0), 0)}/{sales.length * 6}{" "}
+          unidades/dia com líquido calculável. Não representa lucro; registros
+          antigos e recebimentos ausentes não recebem taxas presumidas.
+        </p>
+      </section>
       <section className="detail-hero">
         <span>Soma das compras informadas · {month}</span>
         <strong>

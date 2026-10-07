@@ -1,7 +1,15 @@
+import {
+  availableMonths,
+  currentMonth,
+  daysCovered,
+  monthLabel,
+  todayInSaoPaulo,
+} from "./months";
 import { useEffect, useRef, type ReactNode } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { Link, NavLink } from "./navigation";
 import { useDemo } from "./demo-context";
-import { periods, units, metricNames, type Metric, type Period } from "./data";
+import { units, metricNames, type Metric } from "./data";
 import { currentPrototypeView, prototypeViews } from "./prototype-views";
 export function Icon({
   name,
@@ -177,7 +185,7 @@ export function Shell({ children }: { children: ReactNode }) {
         >
           <span className="brand-logo">
             <img
-              src="/danielli-logo.png"
+              src="/danielli-logo-transparent.png"
               alt="Danielli Restaurante & Doceria"
               width="398"
               height="140"
@@ -210,7 +218,7 @@ export function Shell({ children }: { children: ReactNode }) {
             form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
               "input:not([disabled]), textarea:not([disabled])",
             ),
-          );
+          ).filter((field) => field.getClientRects().length > 0);
           const next = fields[fields.indexOf(event.target) + 1];
           if (next) {
             next.focus();
@@ -269,7 +277,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <Icon name="home" />
               <span>Visão geral</span>
             </NavLink>
-            <NavLink to="/caixa">
+            <NavLink to="/caixa/vendas">
               <Icon name="cash" />
               <span>Caixa</span>
             </NavLink>
@@ -311,23 +319,47 @@ export function Badge({
   );
 }
 export function PeriodSelect() {
-  const { period, setPeriod, scenario } = useDemo();
+  const { period, setPeriod } = useDemo();
+  const months = availableMonths();
+  const today = todayInSaoPaulo();
   return (
-    <label className="period-select">
-      <span className="eyebrow">PERÍODO DOS INDICADORES</span>
-      <select
-        value={period}
-        onChange={(e) => setPeriod(e.target.value as Period)}
-      >
-        {Object.entries(periods)
-          .filter(([id]) => scenario !== "real" || id === "2026-07")
-          .map(([id, label]) => (
-            <option key={id} value={id}>
-              {label} · {scenario === "real" ? "livro real" : "exemplo"}
-            </option>
-          ))}
-      </select>
-    </label>
+    <section className="month-filter" aria-label="Filtro de mês">
+      <div className="section-title">
+        <span className="eyebrow">{monthLabel(period)}</span>
+        <button
+          type="button"
+          className="text-link"
+          onClick={() => setPeriod(currentMonth())}
+        >
+          Mês atual
+        </button>
+      </div>
+      <div className="month-buttons">
+        {months.map((month) => (
+          <button
+            type="button"
+            key={month}
+            aria-label={monthLabel(month)}
+            aria-pressed={period === month}
+            className={period === month ? "selected" : ""}
+            onClick={() => setPeriod(month)}
+          >
+            <b>{monthLabel(month, true).replace(".", "")}</b>
+            <small>
+              {month.slice(0, 4)}
+              {month === today.slice(0, 7)
+                ? ` · até ${today.slice(-2)}/${today.slice(5, 7)}`
+                : ""}
+            </small>
+          </button>
+        ))}
+      </div>
+      <p className="hint">
+        {period === "2026-07"
+          ? "Dados reais · livro de julho"
+          : `Dados fictícios · ${daysCovered(period)} dias de demonstração`}
+      </p>
+    </section>
   );
 }
 export function Empty({
@@ -392,7 +424,9 @@ export function RowLink({
         "Indicador"
       : parts[0] === "caixa"
         ? "Histórico do caixa"
-        : "Visão geral";
+        : parts[0] === "dias"
+          ? `Registros de ${parts[1].slice(-2)}/${parts[1].slice(5, 7)}/${parts[1].slice(0, 4)}`
+          : "Visão geral";
   return (
     <Link
       className="row-link"

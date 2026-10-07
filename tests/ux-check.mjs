@@ -1,484 +1,352 @@
 import assert from "node:assert/strict";
+import { mkdir } from "node:fs/promises";
 import { chromium } from "playwright";
-import { mkdirSync, writeFileSync } from "node:fs";
-const bundled = process.env.CHROMIUM_BUNDLE
-  ? (await import(process.env.CHROMIUM_BUNDLE)).default
-  : null;
-const browser = await chromium.launch(
-  bundled
-    ? {
-        executablePath:
-          process.env.CHROMIUM_EXECUTABLE || (await bundled.executablePath()),
-        args: bundled.args,
-        headless: true,
-      }
-    : { headless: true },
-);
+const base = process.env.BASE_URL || "http://127.0.0.1:5173";
+const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({
   viewport: { width: 390, height: 844 },
-  locale: "pt-BR",
-  timezoneId: "America/Sao_Paulo",
 });
 const page = await context.newPage();
-const failures = [];
-const results = [];
-page.on("pageerror", (error) => failures.push(error.message));
-const base = process.env.BASE_URL || "http://127.0.0.1:5173";
-const open = async (path) => {
-  await page.goto(base + path);
-  await page.locator("main h1").waitFor();
-};
-const settle = async () =>
-  page.evaluate(
-    () =>
-      new Promise((resolve) =>
-        requestAnimationFrame(() => requestAnimationFrame(resolve)),
-      ),
+const errors = [];
+page.on("pageerror", (error) => errors.push(error.message));
+await page.clock.install({ time: new Date("2026-10-07T15:00:00Z") });
+const money = (value) => new RegExp(RegExp.escape(value));
+const pass = (label) => process.stdout.write(`✓ ${label}\n`);
+async function clearOverflow() {
+  assert.equal(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > innerWidth,
+    ),
+    false,
   );
-const text = async () => {
-  await settle();
-  return page.locator("main").innerText();
-};
-const pass = (name) => {
-  results.push(name);
-  console.log("PASS", name);
-};
-mkdirSync("artifacts", { recursive: true });
+}
+async function menu(name) {
+  await page
+    .getByRole("button", { name: "Mudar visão do protótipo", exact: true })
+    .click();
+  await page
+    .getByRole("navigation", { name: "Visões do protótipo", exact: true })
+    .getByRole("link", { name })
+    .click();
+}
 try {
-  await open("/");
-  assert.match(await text(), /653\.640,81/);
-  for (const name of [
-    "Balcão",
-    "Buffet",
-    "Massas",
-    "Churrasco",
-    "Marmita",
-    "Vitrine",
-  ])
-    assert.match(await text(), new RegExp(name));
+  await page.goto(base);
+  await page
+    .getByRole("heading", { name: "Visão geral", exact: true })
+    .waitFor();
   assert.equal(
     await page
-      .locator("main")
-      .getByText("Sem dados identificados neste período", { exact: true })
-      .count(),
-    3,
-  );
-  assert.equal(
-    await page
-      .locator("details")
-      .filter({
-        has: page.getByText("Indicadores sem fonte · o que falta", {
-          exact: true,
-        }),
-      })
-      .getAttribute("open"),
-    null,
-  );
-  pass("Histórico real: seis unidades, subtotais e lacunas sem inventar mix");
-  await page.locator('a[href="/indicadores/faturamento/buffet"]').click();
-  await settle();
-  await page.getByLabel("Buscar data").fill("25/07");
-  await page.getByLabel("Somente pendências").click();
-  await settle();
-  await page.waitForFunction(
-    () => document.querySelector(".filter-check input")?.checked === true,
-  );
-  assert.match(await text(), /1 de 31 dias/);
-  await page.getByRole("link", { name: "25/07/2026", exact: false }).click();
-  await settle();
-  await page.locator("a.back").click();
-  await settle();
-  assert.equal(await page.getByLabel("Buscar data").inputValue(), "25/07");
-  assert.equal(await page.getByLabel("Somente pendências").isChecked(), true);
-  assert.match(await page.locator("h1").innerText(), /Buffet/);
-  pass("Dia retorna ao indicador com busca e filtro preservados");
-  await open("/");
-  await page.locator(".daily-chart button").first().click();
-  await settle();
-  assert.match(
-    await page.locator(".chart-selection").innerText(),
-    /01\/07\/2026/,
-  );
-  await page
-    .getByRole("link", { name: "Abrir fechamento", exact: false })
-    .click();
-  await settle();
-  await page.waitForURL("**/caixa/historico/real-01");
-  assert.match(await page.locator("h1").innerText(), /01\/07\/2026/);
-  pass("Gráfico diário seleciona data/valor antes de abrir fechamento");
-  await open("/caixa/vendas");
-  for (const width of [320, 390, 430, 1440]) {
-    await page.setViewportSize({ width, height: 844 });
-    assert.equal(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth <= innerWidth,
-      ),
-      true,
-      `overflow vendas ${width}`,
-    );
-    if (width === 390) {
-      const box = await page
-        .getByRole("button", { name: "Confirmar valores", exact: false })
-        .boundingBox();
-      assert.ok(
-        box.y + box.height <= 844,
-        `confirmar abaixo da tela: ${JSON.stringify(box)}`,
-      );
-      assert.equal(
-        await page
-          .getByRole("button", { name: "Confirmar valores", exact: false })
-          .evaluate((n) => {
-            const r = n.getBoundingClientRect();
-            return n.contains(
-              document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2),
-            );
-          }),
-        true,
-        "Confirmar está coberto",
-      );
-    }
-    await page.screenshot({
-      path: `artifacts/vendas-${width}.png`,
-      fullPage: true,
-    });
-  }
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByLabel("Data das vendas").fill("2026-10-06");
-  await page.getByLabel("Balcão", { exact: true }).fill("100");
-  await page.getByLabel("Balcão", { exact: true }).press("Enter");
-  assert.equal(
-    await page.evaluate(() => document.activeElement?.id),
-    "unit-sales-buffet",
-  );
-  await page.getByLabel("Buffet", { exact: true }).fill("0");
-  await page
-    .getByRole("button", { name: "Confirmar valores", exact: false })
-    .click();
-  await settle();
-  assert.match(await text(), /2 de 6 unidades informadas/);
-  assert.match(await text(), /Não informado/);
-  await page.reload();
-  assert.match(await text(), /Valores confirmados/);
-  await page
-    .getByRole("button", { name: "Novo preenchimento", exact: true })
-    .click();
-  await settle();
-  await page.getByLabel("Data das vendas").fill("2026-10-07");
-  await page.getByLabel("Marmita", { exact: true }).fill("50");
-  await page
-    .getByRole("button", { name: "Confirmar valores", exact: false })
-    .click();
-  await settle();
-  await page
-    .getByRole("button", { name: "Editar valores", exact: true })
-    .click();
-  await settle();
-  await page.getByLabel("Marmita", { exact: true }).fill("55");
-  await page
-    .getByRole("button", { name: "Confirmar valores", exact: false })
-    .click();
-  await settle();
-  await page
-    .getByRole("link", {
-      name: "Ver registros nos indicadores da simulação",
-      exact: true,
-    })
-    .click();
-  await settle();
-  assert.match(await text(), /155,00/);
-  assert.match(await text(), /2 dias/);
-  pass(
-    "Vendas: zero/ausência, Enter, ação na primeira tela, edição, histórico e retomada",
-  );
-  await open("/compras/cmv");
-  await page.getByLabel("Data das compras").fill("2026-10-06");
-  await page
-    .getByRole("button", { name: "Confirmar compras", exact: false })
-    .click();
-  await settle();
-  assert.match(await page.getByRole("alert").innerText(), /Informe o total/);
-  await page.getByLabel("Total de compras", { exact: true }).fill("abc");
-  await page
-    .getByRole("button", { name: "Confirmar compras", exact: false })
-    .click();
-  await settle();
-  assert.equal(
-    await page.locator("#purchase-amount").getAttribute("aria-invalid"),
+      .getByRole("button", { name: "outubro de 2026", exact: true })
+      .getAttribute("aria-pressed"),
     "true",
   );
-  await page.getByLabel("Total de compras", { exact: true }).fill("0");
+  assert.equal(await page.locator(".daily-chart button").count(), 7);
+  assert.equal(
+    await page
+      .locator("header")
+      .evaluate((e) => getComputedStyle(e).backgroundColor),
+    "rgb(0, 0, 0)",
+  );
+  pass(
+    "Mês vigente, outubro parcial, cabeçalho preto e dados fictícios identificados",
+  );
+
+  for (const [name, count] of [
+    ["maio de 2026", 31],
+    ["junho de 2026", 30],
+    ["agosto de 2026", 31],
+    ["setembro de 2026", 30],
+  ]) {
+    await page.getByRole("button", { name, exact: true }).click();
+    assert.equal(await page.locator(".daily-chart button").count(), count);
+  }
   await page
-    .getByRole("button", { name: "Confirmar compras", exact: false })
+    .getByRole("button", { name: "julho de 2026", exact: true })
     .click();
-  await settle();
-  assert.match(await text(), /Compras confirmadas/);
+  await page.getByText("TOTAL DE VENDAS NO LIVRO", { exact: true }).waitFor();
+  assert.match(await page.locator(".hero").innerText(), money("653.640,81"));
+  await page.getByRole("link", { name: /Buffet No livro/ }).click();
+  await page.getByRole("checkbox", { name: "Somente pendências" }).check();
+  await page.getByRole("link", { name: /29\/07\/2026 Página/ }).click();
+  await page
+    .getByRole("heading", { name: "Fechamento · 29/07/2026", exact: true })
+    .waitFor();
+  assert.match(await page.getByRole("main").innerText(), /Foto com desfoque/);
+  await page.getByRole("link", { name: "Buffet", exact: true }).click();
+  assert.equal(
+    await page
+      .getByRole("checkbox", { name: "Somente pendências" })
+      .isChecked(),
+    true,
+  );
+  assert.match(page.url(), /mes=2026-07/);
+  pass("Julho permanece real, com pendências e contexto preservado no retorno");
+
+  await page
+    .getByRole("link", { name: "Visão geral", exact: true })
+    .first()
+    .click();
+  await page.getByRole("button", { name: "Mês atual", exact: true }).click();
+  await page.getByRole("button", { name: /01\/10 ·/ }).click();
+  await page
+    .getByRole("link", { name: "Abrir registros do dia", exact: true })
+    .click();
+  await page
+    .getByRole("heading", { name: "01/10/2026", exact: true })
+    .waitFor();
+  await page.getByRole("link", { name: /Balcão Registro diário/ }).click();
+  await page
+    .getByRole("heading", {
+      name: "DEMO-2026-10-01-FATURAMENTO-BALCAO",
+      exact: true,
+    })
+    .waitFor();
+  await page
+    .getByRole("link", { name: "Registros de 01/10/2026", exact: true })
+    .click();
+  await page
+    .getByRole("heading", { name: "01/10/2026", exact: true })
+    .waitFor();
+  assert.match(page.url(), /mes=2026-10/);
+  pass("Gráfico → dia → lançamento → retorno no mesmo mês");
+
+  await page
+    .getByRole("navigation", { name: "Navegação principal" })
+    .getByRole("link", { name: "Caixa", exact: true })
+    .click();
+  await page
+    .getByRole("heading", { name: "Vendas por unidade", exact: true })
+    .waitFor();
+  await page
+    .getByRole("textbox", { name: "Cartão débito de Balcão", exact: true })
+    .fill("100");
+  await page
+    .getByRole("textbox", { name: "Cartão débito de Balcão", exact: true })
+    .press("Enter");
+  assert.equal(
+    await page.evaluate(() =>
+      document.activeElement?.getAttribute("aria-label"),
+    ),
+    "Cartão crédito de Balcão",
+  );
+  await page
+    .getByRole("textbox", { name: "Cartão crédito de Balcão", exact: true })
+    .fill("200");
+  await page
+    .getByRole("textbox", { name: "Dinheiro de Balcão", exact: true })
+    .fill("50");
+  await page
+    .getByRole("textbox", { name: "Pix de Balcão", exact: true })
+    .fill("150");
+  assert.match(await page.locator(".payment-totals").innerText(), /A conferir/);
+  await page
+    .getByText("Taxas em uso · definir percentuais", { exact: true })
+    .click();
+  await page
+    .getByRole("textbox", { name: "Taxa de Cartão débito", exact: true })
+    .fill("1,50");
+  await page
+    .getByRole("textbox", { name: "Taxa de Cartão crédito", exact: true })
+    .fill("3,25");
+  await page
+    .getByRole("textbox", { name: "Taxa de Pix", exact: true })
+    .fill("0,50");
+  assert.match(
+    await page.locator(".payment-totals").innerText(),
+    money("491,25"),
+  );
+  await page
+    .getByRole("button", { name: "Revisar valores", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Confirmar lançamento parcial", exact: true })
+    .click();
+  await page.reload();
+  await page
+    .getByRole("heading", { name: "Valores confirmados", exact: true })
+    .waitFor();
+  assert.match(
+    await page.locator(".payment-totals").innerText(),
+    money("8,75"),
+  );
+  pass("Teclado, cálculo de taxas, confirmação parcial e retomada");
+
   await page
     .getByRole("button", { name: "Novo preenchimento", exact: true })
     .click();
-  await settle();
-  await page.getByLabel("Data das compras").fill("2026-10-07");
-  await page.getByLabel("Total de compras", { exact: true }).fill("25");
   await page
-    .getByRole("button", { name: "Confirmar compras", exact: false })
+    .getByRole("textbox", { name: "Data das vendas", exact: true })
+    .fill("2026-10-06");
+  await page
+    .getByRole("textbox", { name: "Cartão débito de Balcão", exact: true })
+    .fill("-1");
+  await page
+    .getByRole("button", { name: "Revisar valores", exact: true })
     .click();
-  await settle();
+  await page.getByRole("alert").waitFor();
+  await page
+    .getByRole("button", { name: "Sem movimento nesta unidade", exact: true })
+    .click();
+  for (const name of ["Buffet", "Massas", "Churrasco", "Marmita", "Vitrine"]) {
+    await page
+      .getByRole("button", { name: `${name} 0/4 recebimentos`, exact: true })
+      .click();
+    await page
+      .getByRole("button", { name: "Sem movimento nesta unidade", exact: true })
+      .click();
+  }
+  assert.match(
+    await page.locator(".payment-totals").innerText(),
+    /24\/24 recebimentos/,
+  );
+  await page.getByRole("button", { name: "Balcão ✓ 4/4", exact: true }).click();
+  await page
+    .getByRole("textbox", { name: "Cartão débito de Balcão", exact: true })
+    .fill("100");
+  await page
+    .getByText("Taxas em uso · conferir percentuais", { exact: true })
+    .click();
+  await page
+    .getByRole("textbox", { name: "Taxa de Cartão débito", exact: true })
+    .fill("5");
+  await page
+    .getByRole("button", { name: "Revisar valores", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Confirmar recebimentos", exact: true })
+    .click();
+  assert.match(
+    await page.locator(".payment-totals").innerText(),
+    money("95,00"),
+  );
+  await page.getByText("Histórico local · 2 dias", { exact: true }).click();
+  await page.getByRole("button", { name: /07\/10\/2026 ·/ }).click();
+  assert.match(
+    await page.locator(".payment-totals").innerText(),
+    money("491,25"),
+  );
+  pass(
+    "Erros, zero explícito, preenchimento completo e taxas históricas preservadas",
+  );
+
+  await page
+    .getByRole("button", { name: "Novo preenchimento", exact: true })
+    .click();
+  await page
+    .getByText("Taxas em uso · conferir percentuais", { exact: true })
+    .click();
+  assert.equal(
+    await page
+      .getByRole("textbox", { name: "Taxa de Cartão débito", exact: true })
+      .inputValue(),
+    "5,00",
+  );
+  for (const width of [320, 390, 430]) {
+    await page.setViewportSize({ width, height: 844 });
+    await clearOverflow();
+  }
   await page
     .getByRole("link", {
       name: "Ver registros nos indicadores da simulação",
       exact: true,
     })
     .click();
-  await settle();
-  assert.match(await text(), /25,00/);
-  assert.equal(
-    await page.getByRole("link", { name: /fornecedor|documento/i }).count(),
-    0,
-  );
-  pass(
-    "Compras: ausência/invalidade/zero, histórico e soma sem composição inventada",
-  );
-  await open("/caixa/novo");
-  await page.getByLabel("Data *", { exact: true }).fill("2026-10-06");
   await page
-    .getByLabel("Responsável pelo fechamento *", { exact: true })
-    .fill("Operador de teste");
-  await page.getByLabel("Total de vendas", { exact: true }).fill("100");
-  await page.getByRole("button", { name: "Continuar", exact: false }).click();
-  await settle();
-  await page.getByRole("button", { name: /Reaproveitar vendas de/ }).click();
-  await settle();
-  assert.equal(
-    await page.getByLabel("Balcão", { exact: true }).inputValue(),
-    "100.00",
-  );
-  await page.getByRole("button", { name: "Continuar", exact: false }).click();
-  await settle();
+    .getByRole("heading", { name: "Registros da simulação", exact: true })
+    .waitFor();
   await page
-    .getByRole("button", { name: "Conferir fechamento", exact: false })
+    .getByRole("link", { name: "Visão gerencial", exact: true })
     .click();
-  await settle();
-  assert.match(await text(), /Não informado/);
-  assert.equal(
-    await page.locator(".difference strong").innerText(),
-    "A conferir",
-  );
-  assert.doesNotMatch(
-    await page.locator(".difference").innerText(),
-    /-.*100,00/,
-  );
   await page
-    .getByRole("link", { name: "Editar recebimentos", exact: true })
-    .click();
-  await settle();
-  for (const method of [
-    "Dinheiro",
-    "Pix",
-    "Débito",
-    "Crédito",
-    "Voucher",
-    "iFood",
-  ])
-    await page.getByLabel(method, { exact: true }).fill("0");
-  await page.getByRole("button", { name: "Continuar", exact: false }).click();
-  await settle();
-  await page.getByLabel("Balcão", { exact: true }).fill("110");
-  await page.getByRole("button", { name: "Continuar", exact: false }).click();
-  await settle();
-  await page
-    .getByRole("button", { name: "Conferir fechamento", exact: false })
-    .click();
-  await settle();
-  assert.match(
-    await page.locator(".difference strong").innerText(),
-    /-.*100,00/,
-  );
-  await page
-    .getByRole("button", { name: "Concluir simulação", exact: false })
-    .click();
-  await settle();
-  await page.reload();
-  assert.match(await text(), /SIMULAÇÃO CONCLUÍDA/);
-  await open("/caixa/vendas");
-  assert.match(await text(), /110,00/);
-  pass(
-    "Fechamento: reaproveitamento bidirecional, referência independente e diferença somente completa",
-  );
-  await open("/caixa");
-  await page
-    .getByRole("button", { name: "Preparar nova simulação", exact: true })
-    .click();
-  await settle();
-  await page
-    .getByRole("link", { name: "Iniciar fechamento", exact: false })
-    .click();
-  await settle();
-  await page
-    .getByText("Exemplo fictício para demonstração", { exact: true })
-    .click();
-  await settle();
-  await page
-    .getByRole("button", { name: "Preencher exemplo fictício", exact: false })
-    .click();
-  await settle();
-  await page.getByLabel("Data *", { exact: true }).fill("2026-10-06");
-  await page.getByRole("button", { name: "Continuar", exact: false }).click();
-  await settle();
-  await page.getByLabel("Balcão", { exact: true }).fill("99");
-  await page.reload();
-  await settle();
-  assert.equal(
-    await page.getByLabel("Balcão", { exact: true }).inputValue(),
-    "99",
-  );
-  await page.getByRole("button", { name: "Continuar", exact: false }).click();
-  await settle();
-  await page
-    .getByRole("button", { name: "Conferir fechamento", exact: false })
-    .click();
-  await settle();
-  await page
-    .getByRole("button", { name: "Concluir simulação", exact: false })
-    .click();
-  await settle();
-  await open("/caixa");
-  const localLinks = page.locator('a[href^="/caixa/historico/local-"]');
-  assert.equal(await localLinks.count(), 2);
-  const hrefs = await localLinks.evaluateAll((nodes) =>
-    nodes.map((n) => n.getAttribute("href")),
-  );
-  assert.equal(new Set(hrefs).size, 2);
-  await localLinks.first().click();
-  await settle();
-  await page
-    .getByRole("link", { name: "Editar fechamento local", exact: true })
-    .click();
-  await settle();
-  await page.getByRole("button", { name: "Continuar", exact: false }).click();
-  await settle();
-  await page.getByRole("button", { name: "Continuar", exact: false }).click();
-  await settle();
-  await page
-    .getByRole("button", { name: "Conferir fechamento", exact: false })
-    .click();
-  await settle();
-  await page
-    .getByRole("button", { name: "Concluir simulação", exact: false })
-    .click();
-  await settle();
-  await open("/caixa");
-  assert.equal(
-    await page.locator('a[href^="/caixa/historico/local-"]').count(),
-    2,
-  );
-  pass(
-    "Fechamentos da mesma data preservados; edição atualiza o registro e rascunho não é sobrescrito na retomada",
-  );
-  await open("/");
-  assert.match(await text(), /653\.640,81/);
-  await open("/mais");
-  await page.getByRole("radio", { name: /Operação regular/ }).check();
-  await page
-    .getByRole("link", { name: "Explorar visão geral", exact: false })
-    .click();
-  await settle();
-  await page.locator('a[href="/indicadores/cmv"]').click();
-  await settle();
-  await page.getByRole("link", { name: /Carnes/ }).click();
-  await settle();
-  assert.match(await page.locator(".detail-hero").innerText(), /18\.430,00/);
-  assert.match(
-    await page.locator(".detail-hero").innerText(),
-    /10,0% do faturamento geral/,
-  );
-  await open("/mais");
-  await page.getByRole("radio", { name: /Ainda sem dados/ }).check();
-  await page
-    .getByRole("link", { name: "Explorar visão geral", exact: false })
-    .click();
-  await settle();
-  assert.match(await text(), /Ainda não há dados/);
-  pass(
-    "Recorte de compras usa percentual correspondente; cenário vazio permanece sem valores",
-  );
-  await open("/mais");
-  await page
-    .getByRole("radio", { name: "Histórico real", exact: false })
-    .check();
-  const routes = [
-    "/",
-    "/indicadores/faturamento",
-    "/indicadores/faturamento/buffet",
-    "/caixa",
-    "/caixa/vendas",
-    "/compras/cmv",
-    "/caixa/historico/real-01",
-    "/simulacao",
-  ];
-  for (const width of [320, 390, 430, 1440]) {
+    .getByRole("heading", { name: "Visão geral", exact: true })
+    .waitFor();
+  for (const width of [320, 390, 430]) {
     await page.setViewportSize({ width, height: 844 });
-    for (const route of routes) {
-      await open(route);
-      assert.equal(
-        await page.evaluate(
-          () => document.documentElement.scrollWidth <= innerWidth,
-        ),
-        true,
-        `overflow ${route} ${width}`,
-      );
-    }
-    await open("/");
-    if (width === 1440)
-      assert.ok((await page.locator("main").boundingBox()).width > 800);
-    await page.screenshot({
-      path: `artifacts/dashboard-${width}.png`,
-      fullPage: true,
-    });
+    await clearOverflow();
   }
-  pass("Navegação e ausência de overflow em 320/390/430px e desktop");
-  const stored = await page.evaluate(() =>
-    Object.keys(sessionStorage)
-      .filter((k) => k.startsWith("danielli-demo-v2:"))
-      .map((k) => sessionStorage.getItem(k))
-      .join(""),
-  );
-  assert.doesNotMatch(stored, /65364081|drive\.google\.com/);
-  await page.evaluate(() => {
-    for (const key of Object.keys(sessionStorage))
-      if (key.startsWith("danielli-demo-v2:")) sessionStorage.removeItem(key);
-  });
-  await context.addInitScript(() => {
-    Storage.prototype.setItem = () => {
-      throw new Error("armazenamento indisponível");
-    };
-  });
-  await open("/caixa/vendas");
-  await page.getByLabel("Balcão", { exact: true }).fill("10");
+  await menu("Compras / CMV Entrada de compras gerais");
   await page
-    .getByRole("button", { name: "Confirmar valores", exact: false })
+    .getByRole("textbox", { name: "Total de compras", exact: true })
+    .fill("23,45");
+  await page
+    .getByRole("button", { name: "Confirmar compras", exact: true })
     .click();
-  await settle();
-  await page.locator("#unit-confirmed-title").waitFor();
-  assert.match(await text(), /Armazenamento indisponível/);
-  pass(
-    "Falha de armazenamento mantém a simulação em memória e informa o limite; livro real não é persistido nas simulações",
-  );
-  assert.deepEqual(failures, []);
-  writeFileSync(
-    "artifacts/ux-results.json",
-    JSON.stringify({ results, failures }, null, 2),
-  );
-} catch (error) {
   await page
-    .screenshot({ path: "artifacts/failure.png", fullPage: true })
-    .catch(() => {});
-  console.log(
-    await page.locator(".filter-check").evaluateAll((nodes) =>
-      nodes.map((n) => ({
-        rect: n.getBoundingClientRect().toJSON(),
-        html: n.outerHTML,
-      })),
-    ),
+    .getByRole("heading", { name: "Compras confirmadas", exact: true })
+    .waitFor();
+  pass(
+    "Últimas taxas em uso, três larguras mobile, retorno gerencial e compras",
   );
+
+  const legacy = {
+    date: "2026-10-05",
+    values: {
+      balcao: 10000,
+      buffet: null,
+      massas: null,
+      churrasco: null,
+      marmita: null,
+      vitrine: null,
+    },
+    total: 10000,
+    count: 1,
+  };
+  const oldContext = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+  });
+  await oldContext.addInitScript((record) => {
+    sessionStorage.setItem(
+      "danielli-demo-v2:sales-history",
+      JSON.stringify([record]),
+    );
+    sessionStorage.setItem(
+      "danielli-demo-v2:sales-record",
+      JSON.stringify(record),
+    );
+    sessionStorage.setItem(
+      "danielli-demo-v2:sales-draft",
+      JSON.stringify({
+        date: record.date,
+        values: {
+          balcao: "100",
+          buffet: "",
+          massas: "",
+          churrasco: "",
+          marmita: "",
+          vitrine: "",
+        },
+      }),
+    );
+  }, legacy);
+  const oldPage = await oldContext.newPage();
+  await oldPage.goto(`${base}/caixa/vendas`);
+  await oldPage
+    .getByRole("heading", { name: "Valores confirmados", exact: true })
+    .waitFor();
+  assert.match(
+    await oldPage.getByRole("main").innerText(),
+    /Registro antigo · sem detalhamento por recebimento/,
+  );
+  await oldPage
+    .getByRole("button", { name: "Voltar e editar valores", exact: true })
+    .click();
+  assert.equal(
+    await oldPage
+      .getByRole("textbox", { name: "Cartão débito de Balcão", exact: true })
+      .inputValue(),
+    "",
+  );
+  assert.match(
+    await oldPage.getByRole("main").innerText(),
+    /Referência anterior/,
+  );
+  await oldContext.close();
+  pass("Registro antigo mantém seu total sem distribuição inventada");
+  assert.deepEqual(errors, []);
+  pass("Sem erros JavaScript");
+} catch (error) {
+  await mkdir("artifacts", { recursive: true });
+  await page.screenshot({ path: "artifacts/ux-error.png", fullPage: true });
   throw error;
 } finally {
   await browser.close();

@@ -1,11 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link } from "./navigation";
 import { useDemo } from "./demo-context";
 import { Badge, Icon, Note, PrototypeViews } from "./ui";
 import { type Scenario } from "./data";
 import { storagePrefix } from "./local-state";
 import { SourceNote } from "./Real";
 export default function More() {
-  const { scenario, setScenario, setProfile } = useDemo();
+  const { scenario, setScenario, setProfile, setPeriod, period } = useDemo();
   return (
     <>
       <span className="eyebrow">DANIELLI GESTÃO</span>
@@ -28,22 +28,17 @@ export default function More() {
           <Icon name="spark" />
         </div>
         <p>
-          Comece pelo livro real. Use os cenários fictícios para explorar
-          indicadores ainda sem fonte.
+          Escolha o mês na visão geral. Julho preserva o livro real; os outros
+          meses permitem explorar a gestão com dados fictícios.
         </p>
         <fieldset className="scenario-picker">
           <legend className="sr-only">Cenário da demonstração</legend>
           {(
             [
               [
-                "real",
-                "Histórico real",
-                "31 fechamentos de julho de 2026. Valores transcritos e pendências visíveis.",
-              ],
-              [
                 "regular",
-                "Operação regular · fictícia",
-                "Indicadores disponíveis e exemplo de caixa sem diferença.",
+                "Histórico por mês",
+                "Julho usa o livro real; os outros meses usam registros fictícios identificados.",
               ],
               [
                 "diferenca",
@@ -57,12 +52,22 @@ export default function More() {
               ],
             ] as const
           ).map(([id, name, description]) => (
-            <label className={scenario === id ? "selected" : ""} key={id}>
+            <label
+              className={
+                scenario === id || (id === "regular" && scenario === "real")
+                  ? "selected"
+                  : ""
+              }
+              key={id}
+            >
               <input
                 type="radio"
+                disabled={period === "2026-07" && id !== "regular"}
                 name="scenario"
                 value={id}
-                checked={scenario === id}
+                checked={
+                  scenario === id || (id === "regular" && scenario === "real")
+                }
                 onChange={() => setScenario(id as Scenario)}
               />
               <span>
@@ -72,8 +77,24 @@ export default function More() {
             </label>
           ))}
         </fieldset>
+        {period === "2026-07" ? (
+          <p className="hint">
+            Julho mantém o livro real. Cenários alternativos ficam disponíveis
+            nos meses fictícios.
+          </p>
+        ) : null}
+        <button
+          type="button"
+          className="secondary unit-new"
+          onClick={() => {
+            setScenario("regular");
+            setPeriod("2026-07");
+          }}
+        >
+          Selecionar julho real
+        </button>
         <Note>
-          Dados reais e fictícios aparecem em cenários separados. Para manter
+          Dados reais e fictícios aparecem em meses identificados. Para manter
           suas edições, o rascunho do caixa só muda quando você toca em
           “Preencher exemplo fictício”.
         </Note>
@@ -134,10 +155,10 @@ export default function More() {
           <li>
             <b>Fechar o dia</b>
             <p>
-              Abra o caixa, preencha o exemplo e altere um recebimento. Veja a
-              diferença mudar.
+              Escolha uma unidade, informe os recebimentos, confira as taxas e
+              revise o resumo antes de confirmar.
             </p>
-            <Link to="/caixa">Simular fechamento ↗</Link>
+            <Link to="/caixa/vendas">Informar recebimentos por unidade ↗</Link>
           </li>
         </ol>
       </section>

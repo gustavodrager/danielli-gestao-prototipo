@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import { DemoProvider } from "./demo-context";
 import { Shell, Back } from "./ui";
 import Dashboard from "./Dashboard";
-import { Indicator, EntryDetail } from "./Indicator";
+import { Indicator, EntryDetail, DailyDetail } from "./Indicator";
 import { Cash, CashFlow, CashHistory, CashSuccess } from "./Cash";
 import More from "./More";
 import UnitSales from "./UnitSales";
@@ -14,6 +14,7 @@ export default function App() {
       <Shell>
         <Routes>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/dias/:date" element={<DailyDetail />} />
           <Route path="/simulacao" element={<Simulation />} />
           <Route path="/indicadores/:tipo" element={<Indicator />} />
           <Route path="/indicadores/:tipo/:grupo" element={<Indicator />} />

@@ -1,4 +1,5 @@
-import { Link, useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
+import { Link } from "./navigation";
 import { useDemo } from "./demo-context";
 import {
   dateLabel,
@@ -181,7 +182,7 @@ export function Indicator() {
                         key={e.id}
                         to={`/lancamentos/${e.id}`}
                         title={e.document}
-                        subtitle={`${dateLabel(e.date)} · ${e.metric === "faturamento" ? "Resumo histórico agregado" : "Lançamento fictício"}`}
+                        subtitle={`${dateLabel(e.date)} · Lançamento diário fictício`}
                         value={money(e.amount)}
                       />
                     ))
@@ -257,7 +258,7 @@ export function EntryDetail() {
           <dt>Registro</dt>
           <dd>
             {entry.metric === "faturamento"
-              ? "Resumo histórico agregado de exemplo"
+              ? "Registro diário fictício"
               : "Lançamento de exemplo"}
           </dd>
         </div>
@@ -287,6 +288,57 @@ export function EntryDetail() {
         Na implantação, este espaço poderá exibir a foto, nota ou planilha que
         originou o lançamento. O protótipo utiliza somente exemplos.
       </Note>
+    </>
+  );
+}
+
+export function DailyDetail() {
+  const { date } = useParams();
+  const { entries } = useDemo();
+  const list = entries.filter((e) => e.date === date);
+  return (
+    <>
+      <Back to="/">Visão geral</Back>
+      <h1>{date ? dateLabel(date) : "Dia indisponível"}</h1>
+      <Note>
+        Dados fictícios · registro diário de demonstração, sem documento
+        original.
+      </Note>
+      {list.length ? (
+        <>
+          <section className="detail-hero">
+            <span>Total bruto de vendas</span>
+            <strong>
+              {money(
+                sum(
+                  list
+                    .filter((e) => e.metric === "faturamento")
+                    .map((e) => e.amount),
+                ),
+              )}
+            </strong>
+            <Badge kind="calculado" />
+          </section>
+          {Object.entries(metricNames).map(([metric, name]) => (
+            <section className="panel compact" key={metric}>
+              <h2>{name}</h2>
+              {list
+                .filter((e) => e.metric === metric)
+                .map((e) => (
+                  <RowLink
+                    key={e.id}
+                    to={`/lancamentos/${e.id}`}
+                    title={e.groupName}
+                    subtitle="Registro diário fictício"
+                    value={money(e.amount)}
+                  />
+                ))}
+            </section>
+          ))}
+        </>
+      ) : (
+        <Empty text="Não há registro deste dia no mês selecionado." />
+      )}
     </>
   );
 }

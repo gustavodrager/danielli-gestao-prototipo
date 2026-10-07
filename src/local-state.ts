@@ -4,11 +4,12 @@ export const storagePrefix = "danielli-demo-v2:";
 export function useLocalState<T>(
   key: string,
   initial: T | (() => T),
+  normalize?: (raw: T) => T,
 ): [T, Dispatch<SetStateAction<T>>, boolean] {
   const [value, setValue] = useState<T>(() => {
     try {
       const raw = sessionStorage.getItem(storagePrefix + key);
-      if (raw) return JSON.parse(raw);
+      if (raw) return normalize ? normalize(JSON.parse(raw)) : JSON.parse(raw);
     } catch {
       /* aba sem armazenamento */
     }

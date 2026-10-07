@@ -1,3 +1,11 @@
+import {
+  availableMonths,
+  daysCovered,
+  monthLabel,
+  todayInSaoPaulo,
+  type Period,
+} from "./months.ts";
+export { type Period } from "./months.ts";
 export const money = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 export const percent = (n: number) =>
@@ -19,13 +27,10 @@ export const methods = [
   "iFood",
 ] as const;
 export type Metric = "faturamento" | "cmv" | "despesas" | "pessoal";
-export type Period = "2026-09" | "2026-08" | "2026-07";
 export type Scenario = "real" | "regular" | "diferenca" | "vazio";
-export const periods: Record<Period, string> = {
-  "2026-09": "Setembro 2026",
-  "2026-08": "Agosto 2026",
-  "2026-07": "Julho 2026",
-};
+export const periods = Object.fromEntries(
+  availableMonths().map((month) => [month, monthLabel(month)]),
+) as Record<Period, string>;
 export const metricNames: Record<Metric, string> = {
   faturamento: "Faturamento",
   cmv: "Compras / CMV estimado",
@@ -43,144 +48,131 @@ export interface Entry {
   date: string;
   document: string;
 }
-// Unidades confirmadas pelo usuário; valores, origens e documentos são fictícios.
-const groups: {
-  metric: Metric;
-  id: string;
-  name: string;
-  source: string;
-  values: number[];
-}[] = [
-  {
-    metric: "faturamento",
-    id: "balcao",
-    name: "Balcão",
-    source: "Livro de fechamento",
-    values: [16200, 16200],
-  },
-  {
-    metric: "faturamento",
-    id: "buffet",
-    name: "Buffet",
-    source: "Livro de fechamento",
-    values: [27350, 27350],
-  },
-  {
-    metric: "faturamento",
-    id: "massas",
-    name: "Massas",
-    source: "Livro de fechamento",
-    values: [15600, 15600],
-  },
-  {
-    metric: "faturamento",
-    id: "churrasco",
-    name: "Churrasco",
-    source: "Livro de fechamento",
-    values: [13000, 13000],
-  },
-  {
-    metric: "faturamento",
-    id: "marmita",
-    name: "Marmita",
-    source: "Livro de fechamento",
-    values: [12000, 12000],
-  },
-  {
-    metric: "faturamento",
-    id: "vitrine",
-    name: "Vitrine",
-    source: "Livro de fechamento",
-    values: [8010, 8010],
-  },
+// Exemplos determinísticos por dia. Julho nunca é preenchido com exemplos.
+const mockCosts = [
   {
     metric: "cmv",
     id: "carnes",
     name: "Carnes",
+    base: 1700,
     source: "Fornecedor exemplo A",
-    values: [9215, 9215],
   },
   {
     metric: "cmv",
     id: "buffet",
     name: "Buffet",
+    base: 1500,
     source: "Fornecedor exemplo B",
-    values: [8105, 8105],
   },
   {
     metric: "cmv",
     id: "massas",
     name: "Massas",
+    base: 950,
     source: "Fornecedor exemplo C",
-    values: [4920, 4920],
   },
   {
     metric: "cmv",
     id: "outros",
     name: "Outros insumos",
+    base: 1400,
     source: "Fornecedor exemplo D",
-    values: [7615, 7615],
   },
   {
     metric: "despesas",
     id: "ocupacao",
     name: "Ocupação · exemplo",
-    source: "Recibos de exemplo",
-    values: [12000],
+    base: 400,
+    source: "Recibo de exemplo",
   },
   {
     metric: "despesas",
     id: "servicos",
     name: "Serviços · exemplo",
-    source: "Contas de exemplo",
-    values: [9450],
-  },
-  {
-    metric: "despesas",
-    id: "outras",
-    name: "Outras despesas · exemplo",
-    source: "Livro de despesas",
-    values: [7000],
+    base: 480,
+    source: "Recibo de exemplo",
   },
   {
     metric: "pessoal",
     id: "pessoal",
     name: "Pessoal · total geral",
+    base: 2400,
     source: "Planilha de exemplo",
-    values: [41200],
   },
-];
-export const entries: Entry[] = groups.flatMap((g) =>
-  g.values.map((amount, i) => ({
-    id: `${g.metric}-${g.id}-${i + 1}`,
-    metric: g.metric,
-    group: g.id,
-    groupName: g.name,
-    source: `origem-${g.id}`,
-    sourceName: g.source,
-    amount,
-    date: i === 0 ? "2026-09-15" : "2026-09-30",
-    document: `DEMO-${g.metric === "faturamento" ? "RECEITA-" : ""}${g.id.toUpperCase()}-${i + 1}`,
-  })),
-);
-export function periodEntries(period: Period, scenario: Scenario) {
-  if (scenario === "real") return [];
-  if (period === "2026-07" || scenario === "vazio") return [];
-  if (period === "2026-09") return entries;
-  return entries.map((e) => ({
-    ...e,
-    amount: Math.round(
-      e.amount /
-        (e.metric === "faturamento"
-          ? 1.084
-          : e.metric === "cmv"
-            ? 1.128
-            : 1.03),
-    ),
-    date: e.date.replace("2026-09", "2026-08"),
-  }));
+] as const;
+function seeded(key: string) {
+  let seed = 2166136261;
+  for (const char of key) seed = Math.imul(seed ^ char.charCodeAt(0), 16777619);
+  return (seed >>> 0) / 4294967295;
 }
-export const sum = (values: number[]) => values.reduce((a, b) => a + b, 0);
+export function mockEntries(
+  period: Period,
+  today = todayInSaoPaulo(),
+): Entry[] {
+  if (period === "2026-07" || period < "2026-05") return [];
+  const list: Entry[] = [];
+  const days = daysCovered(period, today);
+  for (let day = 1; day <= days; day++) {
+    const date = `${period}-${String(day).padStart(2, "0")}`;
+    const weekday = new Date(`${date}T12:00:00Z`).getUTCDay();
+    const movement = weekday === 0 || weekday === 6 ? 1.18 : 1;
+    const growth =
+      1 +
+      Math.max(
+        0,
+        (Number(period.slice(0, 4)) - 2026) * 12 + Number(period.slice(-2)) - 5,
+      ) *
+        0.025;
+    const add = (
+      metric: Metric,
+      id: string,
+      name: string,
+      base: number,
+      source: string,
+    ) => {
+      const amount =
+        Math.round(
+          base * movement * growth * (0.88 + seeded(date + id) * 0.24) * 100,
+        ) / 100;
+      list.push({
+        id: `demo-${date}-${metric}-${id}`,
+        metric,
+        group: id,
+        groupName: name,
+        source: `origem-${id}`,
+        sourceName: source,
+        amount,
+        date,
+        document: `DEMO-${date}-${metric.toUpperCase()}-${id.toUpperCase()}`,
+      });
+    };
+    units.forEach((unit, i) =>
+      add(
+        "faturamento",
+        unit.id,
+        unit.name,
+        [2400, 9700, 1400, 2800, 2100, 1100][i],
+        "Registro diário fictício",
+      ),
+    );
+    mockCosts.forEach((cost) =>
+      add(cost.metric, cost.id, cost.name, cost.base, cost.source),
+    );
+  }
+  return list;
+}
+export const entries = mockEntries("2026-09", "2026-09-30");
+export function periodEntries(
+  period: Period,
+  scenario: Scenario,
+  today = todayInSaoPaulo(),
+) {
+  return scenario === "vazio" || period === "2026-07"
+    ? []
+    : mockEntries(period, today);
+}
+export const sum = (values: number[]) =>
+  values.reduce((a, b) => a + Math.round(b * 100), 0) / 100;
 export function totals(list: Entry[]) {
   const total = (metric: Metric) =>
     sum(list.filter((e) => e.metric === metric).map((e) => e.amount));
@@ -193,19 +185,11 @@ export function totals(list: Entry[]) {
     purchases,
     expenses,
     staff,
-    result: revenue - purchases - expenses - staff,
+    result: sum([revenue, -purchases, -expenses, -staff]),
     cmvPercent: revenue ? (purchases / revenue) * 100 : null,
     primeCost: revenue ? ((purchases + staff) / revenue) * 100 : null,
   };
 }
-export const trend = [
-  { label: "Abr", value: 142100 },
-  { label: "Mai", value: 158900 },
-  { label: "Jun", value: 153700 },
-  { label: "Jul", value: null },
-  { label: "Ago", value: totals(periodEntries("2026-08", "regular")).revenue },
-  { label: "Set", value: totals(entries).revenue },
-];
 export interface CashDraft {
   localId?: string;
   date: string;

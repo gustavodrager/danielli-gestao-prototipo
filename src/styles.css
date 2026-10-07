@@ -1487,7 +1487,7 @@ textarea::placeholder {
   opacity: 1;
 }
 
-/* Evolução gerencial e operação compacta, preservando o fundo preto. */
+/* Evolução gerencial e operação compacta. */
 summary {
   cursor: pointer;
   min-height: 44px;
@@ -1705,4 +1705,298 @@ summary {
 
 .operational .bottom-nav {
   backdrop-filter: none;
+}
+
+/* Cabeçalho de marca; conteúdo mantém a identidade clara. */
+.brand-header,
+.operational .brand-header {
+  background: #000;
+  color: #f8f5ed;
+  margin: -25px -24px 24px;
+  padding: 20px 24px;
+  border: 0;
+}
+.brand-header .brand-logo {
+  background: transparent;
+}
+.brand-header .demo-pill {
+  background: #242119;
+  color: #f8f5ed;
+  border-color: #61502c;
+}
+.brand-header .view-menu > summary {
+  color: #e3bd58;
+  background: #171715;
+  border-color: #61502c;
+}
+.brand-header .view-menu nav {
+  color: var(--ink);
+}
+.brand-logo img {
+  object-fit: contain;
+}
+.month-filter {
+  margin: 0 0 20px;
+}
+.month-filter .section-title {
+  align-items: center;
+}
+.month-filter .text-link {
+  min-height: 44px;
+  padding: 8px;
+  background: transparent;
+}
+.month-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.month-buttons button,
+.unit-tabs button {
+  min-height: 54px;
+  padding: 10px 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  text-align: center;
+}
+.month-buttons button b {
+  text-transform: capitalize;
+}
+.month-buttons button small,
+.unit-tabs button small {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+}
+.month-buttons button.selected,
+.unit-tabs button.selected {
+  border: 2px solid #805c12;
+  background: var(--soft);
+  padding: 9px 5px;
+}
+.month-buttons button.selected small,
+.unit-tabs button.selected small {
+  color: #655027;
+}
+.month-filter > .hint {
+  margin: 8px 0 0;
+}
+.unit-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.payment-entry {
+  padding: 18px;
+}
+.payment-entry h2 {
+  font-size: 22px;
+  margin: 0;
+}
+.payment-fields {
+  display: grid;
+  gap: 14px;
+}
+.payment-field {
+  display: block;
+  font-weight: 650;
+}
+.payment-field > span:first-child {
+  display: block;
+  margin-bottom: 6px;
+}
+.payment-field .currency-input {
+  display: flex;
+  width: 100%;
+  min-height: 54px;
+  border: 1px solid #a99e87;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fffdf6;
+  gap: 10px;
+}
+.payment-field .currency-input input {
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 18px;
+  color: var(--ink);
+  outline-offset: 4px;
+}
+.payment-field .currency-input input::placeholder {
+  font-size: 16px;
+  color: #655f54;
+  font-weight: 400;
+}
+.payment-field .currency-input > span {
+  color: #655f54;
+  font-weight: 400;
+}
+.payment-field.invalid .currency-input {
+  border: 2px solid var(--error-line);
+  background: var(--error-bg);
+}
+.payment-field.invalid small {
+  color: var(--error-ink);
+}
+.no-movement {
+  margin: 14px 0;
+  width: 100%;
+}
+.unit-calculation {
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+.unit-calculation > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 7px 0;
+  font-size: 14px;
+}
+.payment-totals {
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 18px 0;
+}
+.payment-totals > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+}
+.payment-totals small {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 400;
+}
+.payment-totals strong {
+  white-space: nowrap;
+  font-size: 18px;
+}
+.payment-totals .net-total {
+  border-top: 1px solid var(--line);
+  margin-top: 4px;
+}
+.payment-totals .net-total > span {
+  font-weight: 650;
+}
+.fee-settings > summary {
+  min-height: 44px;
+  padding: 6px 0;
+  font-weight: 650;
+  cursor: pointer;
+}
+.fee-fields {
+  display: grid;
+  gap: 14px;
+}
+.rate-input {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.rate-input input {
+  min-width: 0;
+}
+.review-unit {
+  border-top: 1px solid var(--line);
+  padding: 18px 0;
+}
+.review-unit h3 {
+  margin: 0;
+  font-size: 18px;
+}
+.review-unit dl {
+  margin: 8px 0;
+}
+.review-unit dd {
+  margin: 0;
+}
+.review-unit .text-link {
+  min-height: 44px;
+  background: transparent;
+  padding: 6px;
+}
+.pending-label {
+  color: var(--muted);
+  display: block;
+  margin-top: 8px;
+}
+.rates-reference {
+  margin: 15px 0;
+}
+.unit-new.text-link {
+  display: block;
+  min-height: 44px;
+}
+.daily-chart button[aria-pressed="true"] {
+  background: #805c12;
+  outline: 2px solid var(--ink);
+}
+@media (min-width: 700px) {
+  .month-buttons {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .payment-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .fee-fields {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 430px) {
+  .brand-header,
+  .operational .brand-header {
+    margin: -18px -18px 20px;
+    padding: 16px 18px;
+  }
+  .payment-entry {
+    padding: 14px;
+  }
+  .payment-totals {
+    padding: 12px;
+  }
+  .payment-totals strong {
+    font-size: 16px;
+  }
+}
+
+.operational .brand-header {
+  margin-top: -12px;
+}
+@media (max-width: 430px) {
+  .brand-header,
+  .operational .brand-header {
+    margin-left: -16px;
+    margin-right: -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+.daily-chart button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.daily-chart button {
+  flex: 1 0 44px;
+  min-width: 44px;
+}
+.review-unit > details {
+  margin-top: 8px;
+}
+.review-unit > details > summary {
+  font-size: 13px;
+  color: var(--muted);
 }

@@ -11,11 +11,14 @@
 
 ## Regras confirmadas
 
-- Identidade atual: logo fornecido, fundo claro, detalhes dourados; sem seletor de tema.
+- Identidade atual: cabeçalho preto, logo transparente (original preservado), conteúdo claro e detalhes dourados; sem seletor de tema.
 - Menu de visões: gerencial, Caixa · vendas e Compras / CMV. Sem botão Histórico real no cabeçalho e sem Fechamento completo neste seletor.
 - Unidades: Balcão, Buffet, Massas, Churrasco, Marmita, Vitrine. Almoço → Buffet; Marmitex → Marmita; Lojista → Vitrine. Cores das comandas ainda não confirmadas.
 - Unidades representam origem da receita; não ratear custos ou despesas. Compras gerais aproximam CMV quando não há estoque; não apresentar CMV real sem fonte.
 - Preservar dados reais, fontes, cobertura e diferenças anotadas. Ausência é null, não zero. Distinguir observado, calculado e estimado. Manter simulações separadas do histórico real.
+- Mês vigente em São Paulo por padrão; preservar `mes=AAAA-MM` nos detalhes. Julho/2026 exclusivamente real; demais meses têm registros diários fictícios determinísticos até hoje, identificados separadamente das classificações observado/calculado/estimado. Não inferir composição de recebimentos do livro por unidade.
+- Caixa: quatro recebimentos por unidade (débito, crédito, dinheiro, Pix); três taxas percentuais comuns, desconhecidas inicialmente. Dinheiro sem desconto. Valores em centavos, percentuais em centésimos, arredondar cada desconto antes de somar. Guardar as taxas utilizadas no registro; não recalcular lançamentos antigos.
+- Confirmação parcial permitida e identificada; vazio não é zero. Líquido apenas com recebimentos completos e taxas necessárias conhecidas. Líquido não é lucro nem referência bruta da conferência. Registros antigos sem detalhamento preservados, inclusive a referência anterior ao editar. Voucher/iFood independentes no reaproveitamento explícito.
 - Implantação gradual: representar a operação atual antes de alterar processos. Não inventar fórmulas, metas, limites, categorias ou regras de negócio.
 - Arquivos sincronizados do projeto em sources/ são referências somente para leitura.
 

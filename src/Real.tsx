@@ -1,9 +1,5 @@
-import {
-  Link,
-  useLocation,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
+import { Link } from "./navigation";
 import { dateLabel, metricNames, money, units, type Metric } from "./data";
 import {
   realCash,

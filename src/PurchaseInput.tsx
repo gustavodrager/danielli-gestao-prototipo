@@ -7,7 +7,7 @@ import {
   purchaseErrors,
 } from "./purchase-input";
 import { Icon } from "./ui";
-import { Link } from "react-router-dom";
+import { Link } from "./navigation";
 
 export default function PurchaseInput() {
   const {
@@ -138,8 +138,8 @@ export default function PurchaseInput() {
                 aria-invalid={errors.some(
                   (error) => error.field === "purchase-date",
                 )}
-                onChange={(event) => {
-                  const date = event.target.value;
+                onInput={(event) => {
+                  const date = event.currentTarget.value;
                   setDraft((current) => ({ ...current, date }));
                   setErrors([]);
                 }}

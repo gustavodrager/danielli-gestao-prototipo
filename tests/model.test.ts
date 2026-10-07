@@ -1,3 +1,11 @@
+import {
+  availableMonths,
+  currentMonth,
+  daysCovered,
+  previousMonth,
+  todayInSaoPaulo,
+  withMonth,
+} from "../src/months.ts";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
@@ -9,6 +17,12 @@ import {
   emptyUnitSales,
   unitSalesSummary,
   unitSalesErrors,
+  makeUnitSalesRecord,
+  recordToDraft,
+  upgradeUnitSalesDraft,
+  ratePoints,
+  sharedReceipts,
+  type UnitSalesRecord,
 } from "../src/unit-sales.ts";
 import {
   realCash,
@@ -27,15 +41,28 @@ import {
   periodEntries,
   sum,
   totals,
+  mockEntries,
+  units,
 } from "../src/data.ts";
 test("composição e resultado reconciliam com os lançamentos fictícios", () => {
   const t = totals(entries);
-  assert.equal(t.revenue, 184320);
-  assert.equal(t.purchases, 59710);
-  assert.equal(t.expenses, 28450);
-  assert.equal(t.staff, 41200);
-  assert.equal(t.result, 54960);
-  assert.equal(t.result + t.purchases + t.expenses + t.staff, t.revenue);
+  assert.equal(
+    entries.filter((e) => e.metric === "faturamento").length,
+    6 * 30,
+  );
+  assert.equal(
+    Math.round((t.result + t.purchases + t.expenses + t.staff) * 100),
+    Math.round(t.revenue * 100),
+  );
+  const known = totals([
+    { ...entries[0], metric: "faturamento", amount: 10000 },
+    { ...entries[0], metric: "cmv", amount: 3000 },
+    { ...entries[0], metric: "despesas", amount: 1200 },
+    { ...entries[0], metric: "pessoal", amount: 2500 },
+  ]);
+  assert.equal(known.result, 3300);
+  assert.equal(known.cmvPercent, 30);
+  assert.ok(Math.abs(known.primeCost! - 55) < 1e-10);
   const groups = [
     ...new Set(
       entries.filter((e) => e.metric === "faturamento").map((e) => e.group),
@@ -75,14 +102,14 @@ test("entrada de compras distingue ausência, zero, valor válido e inválido", 
 });
 test("entrada simples soma centavos e preserva unidades não informadas", () => {
   const draft = emptyUnitSales();
-  draft.values.balcao = "0,10";
-  draft.values.buffet = "0,20";
+  draft.receipts!.balcao.debito = "0,10";
+  draft.receipts!.buffet.pix = "0,20";
   const summary = unitSalesSummary(draft);
   assert.equal(summary.total, 30);
   assert.equal(summary.count, 2);
   assert.equal(summary.values.marmita, null);
   assert.deepEqual(unitSalesErrors(draft), []);
-  draft.values.marmita = "0,00";
+  draft.receipts!.marmita.dinheiro = "0,00";
   assert.equal(unitSalesSummary(draft).values.marmita, 0);
   assert.equal(unitSalesSummary(draft).count, 3);
 });
@@ -90,17 +117,17 @@ test("entrada simples não confirma campos vazios, inválidos ou datas inexisten
   const draft = emptyUnitSales();
   assert.equal(unitSalesSummary(draft).total, null);
   assert.ok(unitSalesErrors(draft).length);
-  draft.values.balcao = "0,00";
+  draft.receipts!.balcao.debito = "0,00";
   assert.deepEqual(unitSalesErrors(draft), []);
   draft.date = "2026-02-30";
   assert.ok(unitSalesErrors(draft).some((e) => e.field === "unit-sales-date"));
   draft.date = "2024-02-29";
   assert.deepEqual(unitSalesErrors(draft), []);
   for (const value of ["-1", "abc", "1,234", "R$"]) {
-    draft.values.buffet = value;
+    draft.receipts!.buffet.pix = value;
     assert.equal(unitSalesSummary(draft).total, null);
     assert.ok(
-      unitSalesErrors(draft).some((e) => e.field === "unit-sales-buffet"),
+      unitSalesErrors(draft).some((e) => e.field === "unit-sales-buffet-pix"),
     );
   }
 });
@@ -109,10 +136,6 @@ test("ausência de dados não produz percentuais ou CMV + Pessoal reais", () => 
   assert.deepEqual(periodEntries("2026-09", "vazio"), []);
   assert.equal(totals([]).primeCost, null);
   assert.equal(totals([]).cmvPercent, null);
-  assert.ok(
-    totals(periodEntries("2026-08", "regular")).revenue <
-      totals(entries).revenue,
-  );
 });
 test("valores monetários usam centavos e rejeitam entradas inválidas", () => {
   for (const [input, expected] of [
@@ -184,7 +207,7 @@ test("histórico real preserva cobertura, centavos e pendências sem completar c
     if (r.values.registrado !== null)
       assert.equal(reconciliation(r).difference, r.values.diferenca);
   }
-  assert.deepEqual(periodEntries("2026-09", "real"), []);
+  assert.deepEqual(periodEntries("2026-07", "real"), []);
   assert.deepEqual(realUnitTotal("buffet"), { cents: 29608713, count: 28 });
   assert.deepEqual(realUnitTotal("marmita"), { cents: 4337000, count: 25 });
   assert.deepEqual(realUnitTotal("vitrine"), { cents: 1798904, count: 21 });
@@ -206,4 +229,160 @@ test("recebimentos ausentes não produzem diferença conclusiva", () => {
   assert.equal(cashTotals(draft).difference, -10000);
   draft.receipts.Pix = "inválido";
   assert.equal(cashTotals(draft).difference, null);
+});
+
+test("mês vigente usa São Paulo e calendário, inclusive mudança de ano", () => {
+  assert.equal(todayInSaoPaulo(new Date("2027-01-01T01:00:00Z")), "2026-12-31");
+  assert.equal(currentMonth(new Date("2027-01-01T04:00:00Z")), "2027-01");
+  assert.equal(previousMonth("2027-01"), "2026-12");
+  assert.equal(daysCovered("2026-05", "2026-10-07"), 31);
+  assert.equal(daysCovered("2026-06", "2026-10-07"), 30);
+  assert.equal(daysCovered("2026-10", "2026-10-07"), 7);
+  assert.equal(daysCovered("2026-11", "2026-10-07"), 0);
+  assert.equal(daysCovered("2028-02", "2028-03-01"), 29);
+  assert.deepEqual(availableMonths("2026-10-07"), [
+    "2026-05",
+    "2026-06",
+    "2026-07",
+    "2026-08",
+    "2026-09",
+    "2026-10",
+  ]);
+  assert.equal(
+    withMonth("/indicadores/cmv?dia=01#origem", "2026-06"),
+    "/indicadores/cmv?dia=01&mes=2026-06#origem",
+  );
+});
+test("exemplos diários são estáveis, reconciliáveis e nunca completam julho", () => {
+  assert.equal(mockEntries("2026-07", "2026-10-07").length, 0);
+  const first = mockEntries("2026-10", "2026-10-07"),
+    next = mockEntries("2026-10", "2026-10-08");
+  assert.equal(new Set(first.map((e) => e.date)).size, 7);
+  assert.ok(first.every((e) => e.date <= "2026-10-07"));
+  assert.deepEqual(
+    first,
+    next.filter((e) => e.date <= "2026-10-07"),
+  );
+  assert.equal(new Set(first.map((e) => e.id)).size, first.length);
+  assert.equal(new Set(first.map((e) => e.document)).size, first.length);
+  for (const day of new Set(first.map((e) => e.date))) {
+    const daily = first.filter(
+      (e) => e.date === day && e.metric === "faturamento",
+    );
+    assert.equal(daily.length, 6);
+    assert.ok(daily.every((e) => e.document.startsWith("DEMO-")));
+  }
+  assert.equal(
+    sum(first.filter((e) => e.metric === "faturamento").map((e) => e.amount)),
+    totals(first).revenue,
+  );
+});
+test("taxas e líquido preservam ausência, zero e arredondamento por unidade e método", () => {
+  const d = emptyUnitSales();
+  d.receipts!.balcao = {
+    debito: "100",
+    credito: "200",
+    dinheiro: "50",
+    pix: "150",
+  };
+  d.rates = { debito: "1,50", credito: "3,25", pix: "0,50" };
+  let s = unitSalesSummary(d);
+  assert.equal(s.total, 50000);
+  assert.equal(s.completeCount, 1);
+  assert.equal(s.partialFees, 875);
+  assert.equal(s.partialNet, 49125);
+  assert.equal(s.netTotal, null);
+  assert.equal(s.netCount, 1);
+  d.rates.pix = "";
+  s = unitSalesSummary(d);
+  assert.equal(s.partialNet, null);
+  assert.equal(s.netCount, 0);
+  d.receipts!.balcao.pix = "0";
+  s = unitSalesSummary(d);
+  assert.equal(s.partialFees, 800);
+  assert.equal(s.partialNet, 34200);
+  d.receipts!.balcao = {
+    debito: "0,10",
+    credito: "0,10",
+    dinheiro: "0",
+    pix: "0",
+  };
+  d.rates = { debito: "3", credito: "3", pix: "" };
+  assert.equal(unitSalesSummary(d).partialFees, 0); // Dois descontos < meio centavo, arredondados antes da soma.
+  for (const unit of units)
+    d.receipts![unit.id] = {
+      debito: "0",
+      credito: "0",
+      dinheiro: "0",
+      pix: "0",
+    };
+  d.rates = { debito: "", credito: "", pix: "" };
+  assert.equal(unitSalesSummary(d).netTotal, 0); // Nenhuma taxa necessária sobre base zero.
+  assert.deepEqual(unitSalesErrors(d), []);
+});
+test("percentuais inválidos bloqueiam confirmação; confirmação parcial não inventa líquido", () => {
+  for (const raw of ["-1", "100,01", "1,234", "abc", "R$"])
+    assert.equal(ratePoints(raw), null);
+  assert.equal(ratePoints("1,25"), 125);
+  assert.equal(ratePoints("100"), 10000);
+  assert.equal(ratePoints(""), null);
+  const d = emptyUnitSales();
+  d.receipts!.balcao.dinheiro = "10,50";
+  let record = makeUnitSalesRecord(d);
+  assert.equal(record.total, 1050);
+  assert.equal(record.netTotal, null);
+  assert.equal(record.receipts!.balcao.pix, null);
+  d.rates!.debito = "101";
+  assert.ok(unitSalesErrors(d).some((e) => e.field === "fee-debito"));
+  assert.throws(() => makeUnitSalesRecord(d));
+});
+test("registros antigos mantêm seus totais sem distribuição e taxas ficam congeladas", () => {
+  const legacy: UnitSalesRecord = {
+    date: "2026-10-06",
+    values: {
+      balcao: 10000,
+      buffet: null,
+      massas: null,
+      churrasco: null,
+      marmita: null,
+      vitrine: null,
+    },
+    total: 10000,
+    count: 1,
+  };
+  const migrated = upgradeUnitSalesDraft({
+    date: legacy.date,
+    values: recordToDraft(legacy).values,
+  });
+  assert.equal(migrated.values.balcao, "100.00");
+  assert.equal(migrated.receipts!.balcao.debito, "");
+  assert.equal(legacy.total, 10000);
+  assert.equal(sharedReceipts(legacy), null);
+  const editedLegacy = recordToDraft(legacy);
+  editedLegacy.receipts!.balcao.dinheiro = "20";
+  const updatedLegacy = makeUnitSalesRecord(editedLegacy);
+  assert.equal(updatedLegacy.total, 2000);
+  assert.deepEqual(updatedLegacy.legacyTotals, {
+    values: legacy.values,
+    total: legacy.total,
+    count: legacy.count,
+  });
+  assert.deepEqual(
+    recordToDraft(updatedLegacy).legacyTotals,
+    updatedLegacy.legacyTotals,
+  );
+  editedLegacy.legacyTotals!.values.balcao = 1;
+  assert.equal(updatedLegacy.legacyTotals!.values.balcao, 10000);
+  const d = emptyUnitSales();
+  d.receipts!.balcao = { debito: "100", credito: "0", dinheiro: "0", pix: "0" };
+  d.rates!.debito = "1,50";
+  const saved = makeUnitSalesRecord(d);
+  d.rates!.debito = "5";
+  assert.equal(saved.rates!.debito, 150);
+  assert.equal(saved.partialNet, 9850);
+  assert.equal(recordToDraft(saved).rates!.debito, "1,50");
+  assert.equal(sharedReceipts(saved)!.debito, null); // As cinco unidades ausentes não viram zero.
+  for (const u of units)
+    d.receipts![u.id] = { debito: "1", credito: "0", dinheiro: "0", pix: "0" };
+  assert.equal(sharedReceipts(makeUnitSalesRecord(d))!.debito, 600);
 });

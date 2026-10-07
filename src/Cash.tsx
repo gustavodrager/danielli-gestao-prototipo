@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Link } from "./navigation";
 import { useDemo } from "./demo-context";
 import {
   cashErrors,
@@ -13,10 +14,10 @@ import {
   units,
   type CashDraft,
 } from "./data";
-import { unitSalesSummary } from "./unit-sales";
-import { upsertByDate } from "./local-state";
+import { sharedReceipts, paymentMethods, type UnitId } from "./unit-sales";
 import { Back, Badge, Icon, Note, RowLink } from "./ui";
 import { RealCashDetail, RealHistoryList } from "./Real";
+import { withMonth } from "./months";
 const stepPaths = [
   "/caixa/novo",
   "/caixa/novo/unidades",
@@ -95,7 +96,9 @@ export function Cash() {
       </Note>
       <section className="panel">
         <h2>Entrada simples por unidade</h2>
-        <p>Data e totais vendidos nas seis unidades.</p>
+        <p>
+          Recebimentos por unidade, totais e taxas calculados automaticamente.
+        </p>
         <Link
           className="primary"
           to="/caixa/vendas"
@@ -208,11 +211,8 @@ export function CashFlow({ step }: { step: number }) {
     setClosed,
     scenario,
     unitSalesRecords,
-    unitSalesDraft,
+    period,
     setCashRecords,
-    setUnitSalesRecords,
-    setUnitSalesDraft,
-    setUnitSalesRecord,
     localSaved,
   } = useDemo();
   const navigate = useNavigate();
@@ -227,7 +227,8 @@ export function CashFlow({ step }: { step: number }) {
   }, [errors]);
   const update = (patch: Partial<CashDraft>) =>
     setDraft((current) => ({ ...current, ...patch }));
-  if (closed) return <Navigate to="/caixa/concluido" replace />;
+  if (closed)
+    return <Navigate to={withMonth("/caixa/concluido", period)} replace />;
   function next() {
     const validation =
       step === 1
@@ -253,24 +254,9 @@ export function CashFlow({ step }: { step: number }) {
         ...current.filter((r) => r.localId !== completed.localId),
         completed,
       ]);
-      const shared = {
-        date: draft.date,
-        values: draft.units as typeof unitSalesDraft.values,
-      };
-      const summary = unitSalesSummary(shared);
-      if (summary.total !== null) {
-        const record = {
-          date: draft.date,
-          values: summary.values,
-          total: summary.total,
-          count: summary.count,
-        };
-        setUnitSalesRecords((current) => upsertByDate(current, record));
-        setUnitSalesDraft(shared);
-        setUnitSalesRecord(record);
-      }
-      navigate("/caixa/concluido", { replace: true });
-    } else navigate(stepPaths[step]);
+      // A conferência não substitui o histórico detalhado de recebimentos e taxas.
+      navigate(withMonth("/caixa/concluido", period), { replace: true });
+    } else navigate(withMonth(stepPaths[step], period));
   }
   return (
     <>
@@ -350,7 +336,7 @@ export function CashFlow({ step }: { step: number }) {
                   value={draft.date}
                   min="2000-01-01"
                   max="2099-12-31"
-                  onChange={(e) => update({ date: e.target.value })}
+                  onInput={(e) => update({ date: e.currentTarget.value })}
                 />
               </label>
               <label className="text-field">
@@ -380,6 +366,47 @@ export function CashFlow({ step }: { step: number }) {
               onChange={(sales) => update({ sales })}
             />
             <h2>Formas de recebimento</h2>
+            {(() => {
+              const saved = unitSalesRecords.find(
+                (record) => record.date === draft.date,
+              );
+              const shared = saved ? sharedReceipts(saved) : null;
+              if (
+                !shared ||
+                Object.values(shared).every((value) => value === null)
+              )
+                return null;
+              return (
+                <>
+                  <button
+                    type="button"
+                    className="secondary"
+                    onClick={() => {
+                      const names = {
+                        debito: "Débito",
+                        credito: "Crédito",
+                        dinheiro: "Dinheiro",
+                        pix: "Pix",
+                      } as const;
+                      const receipts = { ...draft.receipts };
+                      for (const [id, name] of Object.entries(names)) {
+                        const amount = shared[id as keyof typeof shared];
+                        if (amount !== null)
+                          receipts[name] = (amount / 100).toFixed(2);
+                      }
+                      update({ receipts });
+                    }}
+                  >
+                    Reaproveitar recebimentos de {dateLabel(draft.date)}
+                  </button>
+                  <p className="hint">
+                    Reaproveita somente formas com valores nas seis unidades. Os
+                    demais campos, Voucher, iFood e a referência de vendas
+                    permanecem como informados.
+                  </p>
+                </>
+              );
+            })()}
             {methods.map((m) => (
               <AmountInput
                 key={m}
@@ -403,8 +430,8 @@ export function CashFlow({ step }: { step: number }) {
         ) : step === 2 ? (
           <>
             <p>
-              Confira os valores por unidade. A referência de vendas permanece
-              independente.
+              Confira os valores por unidade. O reaproveitamento usa somente
+              unidades completas; a referência de vendas permanece independente.
             </p>
             {(() => {
               const saved = unitSalesRecords.find((r) => r.date === draft.date);
@@ -412,12 +439,16 @@ export function CashFlow({ step }: { step: number }) {
                 ? Object.fromEntries(
                     Object.entries(saved.values).map(([id, v]) => [
                       id,
-                      v === null ? "" : (v / 100).toFixed(2),
+                      v === null ||
+                      (saved.receipts &&
+                        paymentMethods.some(
+                          (m) => saved.receipts![id as UnitId][m.id] === null,
+                        ))
+                        ? ""
+                        : (v / 100).toFixed(2),
                     ]),
                   )
-                : unitSalesDraft.date === draft.date
-                  ? unitSalesDraft.values
-                  : null;
+                : null;
               return source ? (
                 <button
                   type="button"
