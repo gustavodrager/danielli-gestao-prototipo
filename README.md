@@ -1,6 +1,16 @@
 # Danielli Gestão — Protótipo UX/UI
 
-Protótipo mobile-first do Restaurante e Doceria Danielli, com o logo fornecido e identidade em **preto e dourado**, com fundo preto definitivo. O menu no topo alterna entre visão gerencial, vendas do Caixa, compras/CMV e fechamento completo. Não há seletor de fundo branco. Unidades confirmadas: **Balcão, Buffet, Massas, Churrasco, Marmita e Vitrine**. O indicador antes chamado Prime Cost aparece como **CMV + Pessoal**; a rota antiga continua compatível.
+Protótipo mobile-first do Restaurante e Doceria Danielli, com o logo fornecido, **fundo claro e detalhes dourados**. O menu no topo alterna entre visão gerencial, vendas do Caixa e compras/CMV. O botão Histórico real foi removido do cabeçalho e Fechamento completo foi retirado do seletor de visões. Não há seletor de tema. Unidades confirmadas: **Balcão, Buffet, Massas, Churrasco, Marmita e Vitrine**. O indicador antes chamado Prime Cost aparece como **CMV + Pessoal**; a rota antiga continua compatível.
+
+## Ambiente único e fluxo de trabalho
+
+- **Fonte única do código:** [gustavodrager/danielli-gestao-prototipo](https://github.com/gustavodrager/danielli-gestao-prototipo), branch `main`.
+- **Versão publicada:** [Danielli Gestão](https://danielli-gestao-prototipo-seven.vercel.app/), projeto Vercel existente `danielli-gestao-prototipo` (`prj_BNKtgmQNBAUeqOm3Z3RnY0lZxuse`). A integração com GitHub publica os commits de `main` automaticamente.
+- **Prévia local:** `http://127.0.0.1:5173`, executando uma cópia do mesmo repositório; não é uma versão independente.
+
+Antes de continuar em outra conversa ou máquina, buscar a versão atual do GitHub e conferir alterações locais. Trabalhar sempre neste repositório, preservar alterações concorrentes, validar build/modelo e experiência mobile antes de enviar commits. Depois da publicação, conferir que o commit ativo na Vercel corresponde ao commit enviado.
+
+ZIPs antigos são somente backups históricos. **Não atualizar nem usar ZIP para transportar versões entre conversas.** Uma conversa na nuvem deve acessar o mesmo repositório GitHub. Não criar outro repositório ou projeto Vercel para a mesma aplicação. Dados de simulação da aba continuam locais; esta unificação é do código e da publicação, sem introduzir backend ou sincronização de lançamentos.
 
 ## Dados e origem
 

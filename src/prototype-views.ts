@@ -23,14 +23,6 @@ export const prototypeViews = [
     profile: "compras",
     icon: "document",
   },
-  {
-    id: "fechamento",
-    name: "Fechamento completo",
-    description: "Recebimentos, saídas e conferência",
-    path: "/caixa",
-    profile: "gestor",
-    icon: "cash",
-  },
 ] as const;
 export type PrototypeProfile = "gestor" | "caixa" | "compras";
 export function currentPrototypeView(
@@ -39,7 +31,7 @@ export function currentPrototypeView(
 ) {
   if (pathname.startsWith("/compras/cmv")) return "cmv";
   if (pathname === "/caixa/vendas") return "vendas";
-  if (pathname.startsWith("/caixa")) return "fechamento";
+  if (pathname.startsWith("/caixa")) return "gestor";
   if (pathname === "/")
     return profile === "caixa"
       ? "vendas"

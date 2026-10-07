@@ -1,27 +1,27 @@
-/* Danielli: permanent black background and gold accents. */
+/* Danielli: light background and gold accents. */
 :root {
-  color-scheme: dark;
-  --canvas: #000000;
-  --paper: #090909;
-  --surface: #161615;
-  --soft: #242119;
-  --hover: #2a261b;
-  --ink: #f8f5ed;
-  --muted: #bcb7ad;
-  --line: #39352d;
+  color-scheme: light;
+  --canvas: #f5f2ea;
+  --paper: #ffffff;
+  --surface: #ffffff;
+  --soft: #f4efdf;
+  --hover: #eee7d4;
+  --ink: #242119;
+  --muted: #655f54;
+  --line: #ded8cb;
   --gold: #d6a72c;
   --accent: var(--gold);
-  --gold-text: #e3bd58;
-  --warning-bg: #2b2414;
-  --warning-line: #745a21;
-  --observed-bg: #18262c;
-  --observed-ink: #bddbe6;
-  --observed-line: #34505b;
-  --error-bg: #311e1b;
-  --error-ink: #f6b9a8;
-  --error-line: #b67a64;
+  --gold-text: #805c12;
+  --warning-bg: #fff4d4;
+  --warning-line: #d6b76c;
+  --observed-bg: #eef5f7;
+  --observed-ink: #34505b;
+  --observed-line: #bfced5;
+  --error-bg: #fff0eb;
+  --error-ink: #8a3020;
+  --error-line: #b76a54;
   --chart: #b18d3b;
-  --nav-bg: #171715f5;
+  --nav-bg: #fffffff5;
 }
 :root {
   font-family:
@@ -1433,7 +1433,7 @@ summary {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 16px;
-  box-shadow: 0 12px 40px #00000088;
+  box-shadow: 0 12px 40px #00000020;
   z-index: 40;
 }
 .view-menu nav > .eyebrow {
