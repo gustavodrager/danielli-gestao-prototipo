@@ -12,7 +12,7 @@
 ## Regras confirmadas
 
 - Identidade atual: cabeçalho preto, logo transparente (original preservado), conteúdo claro e detalhes dourados; sem seletor de tema.
-- Menu de visões e navegação principal: Visão geral, Caixa e Compras (CMV). Sem botão Histórico real no cabeçalho e sem Fechamento completo neste seletor.
+- Menu de visões e navegação principal: Visão geral, Entradas e Despesas. O menu inferior fica fixo e sempre visível, com espaço reservado para não cobrir campos e ações. Sem botão Histórico real no cabeçalho e sem Fechamento completo neste seletor.
 - Unidades: Balcão, Buffet, Massas, Churrasco, Marmita, Vitrine. Almoço → Buffet; Marmitex → Marmita; Lojista → Vitrine. Cores das comandas ainda não confirmadas.
 - Unidades representam origem da receita; não ratear custos ou despesas. Compras gerais aproximam CMV quando não há estoque; não apresentar CMV real sem fonte.
 - Preservar dados reais, fontes, cobertura e diferenças anotadas. Ausência é null, não zero. Distinguir observado, calculado e estimado. Manter simulações separadas do histórico real.

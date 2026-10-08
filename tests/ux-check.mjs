@@ -112,7 +112,7 @@ try {
 
   await page
     .getByRole("navigation", { name: "Navegação principal" })
-    .getByRole("link", { name: "Caixa", exact: true })
+    .getByRole("link", { name: "Entradas", exact: true })
     .click();
   await page
     .getByRole("heading", { name: "Vendas por unidade", exact: true })
@@ -268,7 +268,7 @@ try {
     await page.setViewportSize({ width, height: 844 });
     await clearOverflow();
   }
-  await menu("Compras (CMV) Compras, pessoal e despesas gerais");
+  await menu("Despesas Compras, pessoal e despesas gerais");
   await page
     .getByRole("textbox", { name: "Total de compras", exact: true })
     .fill("23,45");

@@ -1275,7 +1275,7 @@ textarea:focus-visible {
 }
 html {
   scroll-padding-top: 20px;
-  scroll-padding-bottom: 125px;
+  scroll-padding-bottom: calc(125px + env(safe-area-inset-bottom));
 }
 a,
 button,
@@ -1669,18 +1669,10 @@ summary {
     letter-spacing: 0.5px;
   }
 }
-/* Nas entradas, a navegação não cobre campos nem a ação principal. */
-.operational .bottom-nav {
-  position: static;
-  left: auto;
-  bottom: auto;
-  transform: none;
-  width: 100%;
-  max-width: none;
-  margin-top: 20px;
-}
+/* Reservar espaço para a navegação fixa também nas entradas operacionais. */
+.app,
 .operational {
-  padding-bottom: 24px;
+  padding-bottom: calc(120px + env(safe-area-inset-bottom));
 }
 
 .chart-day {
@@ -1701,10 +1693,6 @@ summary {
   .analysis-grid .panel {
     min-width: 0;
   }
-}
-
-.operational .bottom-nav {
-  backdrop-filter: none;
 }
 
 /* Cabeçalho de marca; conteúdo mantém a identidade clara. */

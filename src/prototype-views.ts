@@ -9,7 +9,7 @@ export const prototypeViews = [
   },
   {
     id: "vendas",
-    name: "Caixa",
+    name: "Entradas",
     description: "Recebimentos por unidade de negócio",
     path: "/caixa/vendas",
     profile: "caixa",
@@ -17,7 +17,7 @@ export const prototypeViews = [
   },
   {
     id: "cmv",
-    name: "Compras (CMV)",
+    name: "Despesas",
     description: "Compras, pessoal e despesas gerais",
     path: "/compras/cmv",
     profile: "compras",
