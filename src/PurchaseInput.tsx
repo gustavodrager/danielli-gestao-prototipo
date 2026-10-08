@@ -12,8 +12,9 @@ import {
 } from "./purchase-input";
 import { Icon } from "./ui";
 import { Link } from "./navigation";
+import { focusSpendingForm } from "./spending-navigation";
 
-function PurchaseForm() {
+function PurchaseForm({ onSaved }: { onSaved: (month: string) => void }) {
   const {
     purchaseDraft: draft,
     setPurchaseDraft: setDraft,
@@ -26,6 +27,8 @@ function PurchaseForm() {
   const confirmationRef = useRef<HTMLElement>(null);
   const amount = purchaseAmount(draft.amount);
   const invalid = !!draft.amount.trim() && amount === null;
+  const amountError =
+    invalid || errors.some((e) => e.field === "purchase-amount");
   useEffect(() => {
     if (errors.length) errorRef.current?.focus();
   }, [errors]);
@@ -57,7 +60,7 @@ function PurchaseForm() {
                 <dd>{money(record.amount / 100)}</dd>
               </div>
               {record.reference ? (
-                <div>
+                <div className="full-description">
                   <dt>Descrição do valor informado</dt>
                   <dd className="preserve-lines">{record.reference}</dd>
                 </div>
@@ -73,6 +76,7 @@ function PurchaseForm() {
             onClick={() => {
               setRecord(null);
               setErrors([]);
+              focusSpendingForm();
             }}
           >
             Editar compra
@@ -84,6 +88,7 @@ function PurchaseForm() {
               setDraft(emptyPurchase());
               setRecord(null);
               setErrors([]);
+              focusSpendingForm();
             }}
           >
             Novo preenchimento
@@ -103,7 +108,15 @@ function PurchaseForm() {
               <ul>
                 {errors.map((error) => (
                   <li key={error.field}>
-                    <a href={`#${error.field}`}>{error.message}</a>
+                    <a
+                      href={`#${error.field}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        document.getElementById(error.field)?.focus();
+                      }}
+                    >
+                      {error.message}
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -127,6 +140,7 @@ function PurchaseForm() {
                 amount,
                 reference: draft.reference.trim(),
               });
+              onSaved(draft.date.slice(0, 7));
             }}
           >
             <label className="text-field">
@@ -148,7 +162,7 @@ function PurchaseForm() {
               />
             </label>
             <label
-              className={`payment-field amount-field ${invalid ? "invalid" : ""}`}
+              className={`payment-field amount-field ${amountError ? "invalid" : ""}`}
             >
               <span>Total de compras</span>
               <span className="currency-input">
@@ -162,9 +176,9 @@ function PurchaseForm() {
                   autoComplete="off"
                   value={draft.amount}
                   placeholder="Ex.: 1.420,00"
-                  aria-invalid={invalid}
+                  aria-invalid={amountError}
                   aria-describedby={
-                    invalid ? "purchase-value-error" : undefined
+                    amountError ? "purchase-value-error" : undefined
                   }
                   onChange={(event) => {
                     const value = event.target.value;
@@ -173,7 +187,7 @@ function PurchaseForm() {
                   }}
                 />
               </span>
-              {invalid ? (
+              {amountError ? (
                 <small id="purchase-value-error">
                   Use um valor de zero ou maior, como 1.420,00.
                 </small>
@@ -212,7 +226,10 @@ function PurchaseForm() {
         inicial e final. Valores gerais da Danielli, sem rateio por unidade.
       </p>
       <details className="panel">
-        <summary>Histórico local · {records.length} dias</summary>
+        <summary>
+          Histórico local · {records.length}{" "}
+          {records.length === 1 ? "dia" : "dias"}
+        </summary>
         {records.map((r) => (
           <button
             type="button"
@@ -226,6 +243,7 @@ function PurchaseForm() {
                 amount: (r.amount / 100).toFixed(2),
                 reference: r.reference,
               });
+              focusSpendingForm();
             }}
           >
             <span>
@@ -238,6 +256,7 @@ function PurchaseForm() {
             ) : null}
           </button>
         ))}
+        {!records.length ? <p>Nenhuma compra informada nesta aba.</p> : null}
       </details>
     </section>
   );
@@ -272,7 +291,7 @@ export default function PurchaseInput() {
     });
   return (
     <div className="unit-entry purchase-entry">
-      <span className="eyebrow">ENTRADAS · DANIELLI</span>
+      <span className="eyebrow">DESPESAS · DANIELLI</span>
       <h1>Compras e despesas</h1>
       <p>Escolha o que deseja informar.</p>
       <div
@@ -293,54 +312,61 @@ export default function PurchaseInput() {
           </button>
         ))}
       </div>
-      {area === "cmv" ? (
-        <PurchaseForm />
-      ) : (
-        <>
-          {area === "pessoal" ? (
-            <div
-              className="staff-switch"
-              role="group"
-              aria-label="Tipo de equipe"
-            >
-              <button
-                type="button"
-                className={!freela ? "selected" : ""}
-                aria-pressed={!freela}
-                onClick={() => choose("equipe", "fixa")}
+      <section
+        id="spending-form"
+        tabIndex={-1}
+        aria-label="Preenchimento do lançamento"
+      >
+        {area === "cmv" ? (
+          <PurchaseForm onSaved={(month) => choose("resumo", month)} />
+        ) : (
+          <>
+            {area === "pessoal" ? (
+              <div
+                className="staff-switch"
+                role="group"
+                aria-label="Tipo de equipe"
               >
-                Equipe fixa
-              </button>
-              <button
-                type="button"
-                className={freela ? "selected" : ""}
-                aria-pressed={freela}
-                onClick={() => choose("equipe", "freela")}
-              >
-                Equipe Extra
-              </button>
-            </div>
-          ) : null}
-          <ExpenseInput
-            key={
-              area === "pessoal"
-                ? freela
-                  ? "staff-freela"
-                  : "staff-fixed"
-                : area
-            }
-            kind={
-              area === "pessoal"
-                ? freela
-                  ? "staff-freela"
-                  : "staff-fixed"
-                : area === "fixas"
-                  ? "fixed"
-                  : "variable"
-            }
-          />
-        </>
-      )}
+                <button
+                  type="button"
+                  className={!freela ? "selected" : ""}
+                  aria-pressed={!freela}
+                  onClick={() => choose("equipe", "fixa")}
+                >
+                  Equipe fixa
+                </button>
+                <button
+                  type="button"
+                  className={freela ? "selected" : ""}
+                  aria-pressed={freela}
+                  onClick={() => choose("equipe", "freela")}
+                >
+                  Equipe Extra
+                </button>
+              </div>
+            ) : null}
+            <ExpenseInput
+              key={
+                area === "pessoal"
+                  ? freela
+                    ? "staff-freela"
+                    : "staff-fixed"
+                  : area
+              }
+              kind={
+                area === "pessoal"
+                  ? freela
+                    ? "staff-freela"
+                    : "staff-fixed"
+                  : area === "fixas"
+                    ? "fixed"
+                    : "variable"
+              }
+              onSaved={(month) => choose("resumo", month)}
+            />
+          </>
+        )}
+      </section>
       <label className="text-field spending-period">
         Mês do resumo
         <input

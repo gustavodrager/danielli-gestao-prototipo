@@ -11,16 +11,27 @@ import {
   type ExpenseKind,
 } from "./expense-input";
 import { Icon } from "./ui";
+import { purchaseAmount } from "./purchase-input";
+import { focusSpendingForm } from "./spending-navigation";
 
-export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
+export default function ExpenseInput({
+  kind,
+  onSaved,
+}: {
+  kind: ExpenseKind;
+  onSaved: (month: string) => void;
+}) {
   const { expenseDrafts, setExpenseDrafts, expenseRecords, setExpenseRecords } =
     useDemo();
   const draft = expenseDrafts[kind];
   const name = expenseKinds.find((k) => k.id === kind)!.name;
   const isStaff = kind.startsWith("staff-");
   const [errors, setErrors] = useState<ReturnType<typeof expenseErrors>>([]);
+  const invalid =
+    !!draft.amount.trim() && purchaseAmount(draft.amount) === null;
+  const amountError =
+    invalid || errors.some((e) => e.field === "expense-amount");
   const feedback = useRef<HTMLDivElement>(null);
-  const details = useRef<HTMLDetailsElement>(null);
   const update = (patch: Partial<typeof draft>) => {
     setExpenseDrafts((current) => ({
       ...current,
@@ -80,7 +91,7 @@ export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
                 </dd>
               </div>
               {record.reference ? (
-                <div>
+                <div className="full-description">
                   <dt>Descrição do valor informado</dt>
                   <dd className="preserve-lines">{record.reference}</dd>
                 </div>
@@ -91,19 +102,23 @@ export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
           <button
             type="button"
             className="primary"
-            onClick={() => update({ confirmed: false })}
+            onClick={() => {
+              update({ confirmed: false });
+              focusSpendingForm();
+            }}
           >
             Editar lançamento
           </button>
           <button
             type="button"
             className="secondary unit-new"
-            onClick={() =>
+            onClick={() => {
               setExpenseDrafts((current) => ({
                 ...current,
                 [kind]: emptyExpense(),
-              }))
-            }
+              }));
+              focusSpendingForm();
+            }}
           >
             Novo lançamento
           </button>
@@ -119,6 +134,7 @@ export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
             const saved = makeExpenseRecord(draft, kind, crypto.randomUUID());
             setExpenseRecords((current) => upsertExpense(current, saved));
             update({ id: saved.id, confirmed: true });
+            onSaved(saved.month);
           }}
         >
           {errors.length ? (
@@ -134,9 +150,9 @@ export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
                   <li key={e.field}>
                     <a
                       href={`#${e.field}`}
-                      onClick={() => {
-                        if (e.field === "expense-month" && details.current)
-                          details.current.open = true;
+                      onClick={(event) => {
+                        event.preventDefault();
+                        document.getElementById(e.field)?.focus();
                       }}
                     >
                       {e.message}
@@ -164,6 +180,7 @@ export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
             <input
               id="expense-date"
               type="date"
+              enterKeyHint="next"
               required
               value={draft.date}
               aria-invalid={errors.some((e) => e.field === "expense-date")}
@@ -179,7 +196,20 @@ export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
               }}
             />
           </label>
-          <label className="payment-field amount-field">
+          <label className="text-field">
+            Mês de referência
+            <input
+              id="expense-month"
+              type="month"
+              required
+              value={draft.month}
+              aria-invalid={errors.some((e) => e.field === "expense-month")}
+              onInput={(e) => update({ month: e.currentTarget.value })}
+            />
+          </label>
+          <label
+            className={`payment-field amount-field ${amountError ? "invalid" : ""}`}
+          >
             <span>
               {kind === "staff-fixed"
                 ? "Total da equipe fixa"
@@ -191,6 +221,7 @@ export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
               <span aria-hidden="true">R$</span>
               <input
                 id="expense-amount"
+                enterKeyHint="next"
                 aria-label={
                   kind === "staff-fixed"
                     ? "Total da equipe fixa"
@@ -203,12 +234,21 @@ export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
                 autoComplete="off"
                 placeholder="Ex.: 1.250,00"
                 value={draft.amount}
-                aria-invalid={errors.some((e) => e.field === "expense-amount")}
+                aria-invalid={amountError}
+                aria-describedby={
+                  amountError ? "expense-value-error" : "expense-amount-help"
+                }
                 onChange={(e) => update({ amount: e.target.value })}
               />
             </span>
+            {amountError ? (
+              <small id="expense-value-error">
+                Informe um valor de zero ou maior, com até duas casas decimais.
+                Ex.: 1.250,50.
+              </small>
+            ) : null}
           </label>
-          <p className="hint">
+          <p className="hint" id="expense-amount-help">
             Campo vazio significa não informado. Zero deve ser digitado
             explicitamente.
           </p>
@@ -235,41 +275,6 @@ export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
             Descreva o que este valor reúne. Pode ser um gasto, um grupo de
             despesas ou um pagamento da equipe.
           </p>
-          <details
-            ref={details}
-            className="panel expense-details"
-            open={kind === "staff-fixed" ? true : undefined}
-          >
-            <summary>
-              {kind === "staff-fixed"
-                ? "Referência do mês e detalhes"
-                : "Adicionar detalhes / ajustar mês"}
-            </summary>
-            <label className="text-field">
-              Mês de referência
-              <input
-                id="expense-month"
-                type="month"
-                required
-                value={draft.month}
-                aria-invalid={errors.some((e) => e.field === "expense-month")}
-                onInput={(e) => update({ month: e.currentTarget.value })}
-              />
-            </label>
-            <label className="text-field">
-              {isStaff ? "Nome / identificação" : "Categoria"}{" "}
-              <small>Opcional</small>
-              <input
-                value={draft.category}
-                placeholder={
-                  isStaff
-                    ? "Pessoa, grupo ou referência"
-                    : "Ex.: aluguel, contabilidade ou comissão"
-                }
-                onChange={(e) => update({ category: e.target.value })}
-              />
-            </label>
-          </details>
           {isStaff ? (
             <p className="hint">
               Informe o valor conhecido. Encargos e benefícios não são
@@ -291,7 +296,8 @@ export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
       )}
       <details className="panel expense-history">
         <summary>
-          {name} · {history.length} lançamentos
+          {name} · {history.length}{" "}
+          {history.length === 1 ? "lançamento" : "lançamentos"}
         </summary>
         {!history.length ? (
           <p>Nenhum lançamento informado.</p>
@@ -307,9 +313,7 @@ export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
                   [kind]: expenseToDraft(r),
                 }));
                 setErrors([]);
-                document
-                  .getElementById("expense-heading")
-                  ?.scrollIntoView({ block: "start", behavior: "smooth" });
+                focusSpendingForm();
               }}
             >
               <span>

@@ -2034,12 +2034,6 @@ summary {
   gap: 8px;
   margin-bottom: 20px;
 }
-.expense-details {
-  margin: 18px 0;
-}
-.expense-details > .text-field:first-of-type {
-  margin-top: 16px;
-}
 .expense-history {
   margin-top: 24px;
 }
@@ -2097,4 +2091,23 @@ summary {
 .described-record {
   display: block;
   text-align: left;
+}
+
+#spending-form {
+  scroll-margin-top: 20px;
+}
+#spending-form:focus-visible {
+  outline: 2px solid var(--gold-text);
+  outline-offset: 6px;
+  border-radius: 8px;
+}
+
+.purchase-entry .fact-list .full-description {
+  display: block;
+}
+.purchase-entry .full-description dd {
+  margin-top: 6px;
+  text-align: left;
+  font-weight: 400;
+  line-height: 1.5;
 }

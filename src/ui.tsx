@@ -148,16 +148,20 @@ export function Shell({ children }: { children: ReactNode }) {
   useEffect(() => {
     const key = pathname;
     lastPath.current = key;
-    requestAnimationFrame(() =>
-      window.scrollTo(0, scrollPositions.current[key] ?? 0),
-    );
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollPositions.current[key] ?? 0);
+      if (hash) {
+        const target = document.getElementById(hash.slice(1));
+        target?.focus({ preventScroll: true });
+        target?.scrollIntoView();
+      }
+    });
     if (!first.current) mainRef.current?.focus({ preventScroll: true });
     first.current = false;
     const heading = mainRef.current?.querySelector("h1")?.textContent;
     document.title = heading
       ? `${heading} · Danielli Gestão`
       : "Danielli Gestão";
-    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView();
   }, [pathname, hash, scenario, profile]);
   useEffect(() => {
     const track = () => {

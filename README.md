@@ -121,3 +121,9 @@ O menu inferior fica fixo em todas as visões, inclusive nas entradas operaciona
 ## Descrição dos valores — 08/10/2026
 
 As quatro opções da página Despesas mostram o campo opcional “Descrição do valor informado” junto ao valor, com exemplos por tipo de entrada. O texto aparece na confirmação, no histórico e nos lançamentos do resumo mensal. A descrição utiliza o campo de referência/observação já existente, preservando registros anteriores, rascunhos e edição. Não cria novas categorias nem altera cálculos.
+
+## Revisão do fluxo de Despesas — 08/10/2026
+
+A seção recolhível de detalhes foi removida conforme solicitado. O mês de referência fica diretamente junto da data; categoria/identificação deixa de ser um campo no formulário, mas valores existentes continuam preservados nos registros. Descrição permanece opcional junto do valor. O resumo acompanha o mês do lançamento confirmado, e os links de edição levam o foco e a rolagem ao formulário, inclusive no retorno dos registros da simulação. Valores vazios ou inválidos recebem identificação junto ao campo e um aviso com acesso direto à correção. Descrições longas usam a largura da confirmação e preservam quebras de linha.
+
+Revisão no navegador: compras, equipe fixa, equipe extra, despesas fixas/variáveis, confirmação, edição sem duplicação, retomada após recarregar, zero explícito, ausência e valores inválidos. Conferidos lançamentos de setembro feitos em outubro, retorno de outra rota, foco pelo teclado e layouts de 320/390/430 px, com navegação fixa e sem rolagem horizontal. Dados de teste fictícios somente na aba local. Permanecem pendentes o teste com operador/celular real e a confirmação com Higor da base de datas e da composição dos totais de pessoal.
