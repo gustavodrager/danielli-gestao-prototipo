@@ -1,6 +1,12 @@
 import { useSearchParams } from "react-router-dom";
 import { availableMonths, currentMonth, type Period } from "./months";
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  type ReactNode,
+} from "react";
 import {
   emptyDraft,
   periodEntries,
@@ -10,7 +16,7 @@ import {
 import {
   paymentMethods,
   emptyUnitSales,
-  emptyRates,
+  defaultRates,
   ratesToDraft,
   upgradeUnitSalesDraft,
   type FeeDraft,
@@ -57,7 +63,7 @@ function useDemoState() {
   );
   const [feeRates, setFeeRates, ratesSaved] = useLocalState<FeeDraft>(
     "fee-rates",
-    emptyRates,
+    defaultRates,
   );
   const [unitSalesDraft, setUnitSalesDraft, salesSaved] = useLocalState(
     "sales-draft",
@@ -66,6 +72,24 @@ function useDemoState() {
   );
   const [unitSalesRecord, setUnitSalesRecordState, salesRecordSaved] =
     useLocalState<UnitSalesRecord | null>("sales-record", null);
+  const [feePresetApplied, setFeePresetApplied, feePresetSaved] = useLocalState(
+    "fee-preset-2026-10-07",
+    false,
+  );
+  useEffect(() => {
+    if (feePresetApplied) return;
+    setFeeRates(defaultRates());
+    // Aplicar os percentuais solicitados uma vez, preservando registros confirmados.
+    if (!unitSalesRecord)
+      setUnitSalesDraft((current) => ({ ...current, rates: defaultRates() }));
+    setFeePresetApplied(true);
+  }, [
+    feePresetApplied,
+    setFeePresetApplied,
+    setFeeRates,
+    setUnitSalesDraft,
+    unitSalesRecord,
+  ]);
   const [purchaseDraft, setPurchaseDraft, purchaseSaved] = useLocalState(
     "purchase-draft",
     emptyPurchase,
@@ -122,6 +146,7 @@ function useDemoState() {
     setCashRecords,
     localSaved:
       ratesSaved &&
+      feePresetSaved &&
       cashSaved &&
       salesSaved &&
       purchaseSaved &&

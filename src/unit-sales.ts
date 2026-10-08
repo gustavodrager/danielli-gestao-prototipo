@@ -44,6 +44,11 @@ export const emptyRates = (): FeeDraft => ({
   credito: "",
   pix: "",
 });
+export const defaultRates = (): FeeDraft => ({
+  debito: "3,00",
+  credito: "4,00",
+  pix: "1,00",
+});
 export function blankPayments(): UnitPayments<string> {
   return Object.fromEntries(
     units.map((u) => [

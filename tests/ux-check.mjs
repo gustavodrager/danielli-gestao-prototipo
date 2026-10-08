@@ -138,10 +138,14 @@ try {
   await page
     .getByRole("textbox", { name: "Pix de Balcão", exact: true })
     .fill("150");
-  assert.match(await page.locator(".payment-totals").innerText(), /A conferir/);
   await page
-    .getByText("Taxas em uso · definir percentuais", { exact: true })
+    .getByText("Taxas em uso · conferir percentuais", { exact: true })
     .click();
+  for (const method of ["Cartão débito", "Cartão crédito", "Pix"])
+    await page
+      .getByRole("textbox", { name: `Taxa de ${method}`, exact: true })
+      .fill("");
+  assert.match(await page.locator(".payment-totals").innerText(), /A conferir/);
   await page
     .getByRole("textbox", { name: "Taxa de Cartão débito", exact: true })
     .fill("1,50");
@@ -264,7 +268,7 @@ try {
     await page.setViewportSize({ width, height: 844 });
     await clearOverflow();
   }
-  await menu("Compras / CMV Entrada de compras gerais");
+  await menu("Compras (CMV) Entrada de compras gerais");
   await page
     .getByRole("textbox", { name: "Total de compras", exact: true })
     .fill("23,45");

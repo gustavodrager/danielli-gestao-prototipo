@@ -1,7 +1,7 @@
 export const prototypeViews = [
   {
     id: "gestor",
-    name: "Visão gerencial",
+    name: "Visão geral",
     description: "Indicadores e detalhamentos",
     path: "/",
     profile: "gestor",
@@ -9,15 +9,15 @@ export const prototypeViews = [
   },
   {
     id: "vendas",
-    name: "Caixa · vendas",
-    description: "Totais por unidade de negócio",
+    name: "Caixa",
+    description: "Recebimentos por unidade de negócio",
     path: "/caixa/vendas",
     profile: "caixa",
     icon: "cash",
   },
   {
     id: "cmv",
-    name: "Compras / CMV",
+    name: "Compras (CMV)",
     description: "Entrada de compras gerais",
     path: "/compras/cmv",
     profile: "compras",
@@ -31,7 +31,7 @@ export function currentPrototypeView(
 ) {
   if (pathname.startsWith("/compras/cmv")) return "cmv";
   if (pathname === "/caixa/vendas") return "vendas";
-  if (pathname.startsWith("/caixa")) return "gestor";
+  if (pathname.startsWith("/caixa")) return "vendas";
   if (pathname === "/")
     return profile === "caixa"
       ? "vendas"

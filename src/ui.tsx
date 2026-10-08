@@ -131,7 +131,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const { pathname, hash } = useLocation();
   const scrollPositions = useRef<Record<string, number>>({});
   const lastPath = useRef(pathname);
-  const { scenario, profile } = useDemo();
+  const { scenario, profile, setProfile } = useDemo();
   const simulation =
     pathname === "/simulacao" ||
     pathname.startsWith("/caixa/historico/local-") ||
@@ -241,52 +241,22 @@ export function Shell({ children }: { children: ReactNode }) {
         Feito para enxergar o negócio com clareza.
       </footer>
       <nav className="bottom-nav" aria-label="Navegação principal">
-        {profile === "caixa" ? (
+        {prototypeViews.map((view) => (
           <NavLink
-            to="/caixa/vendas"
+            key={view.id}
+            to={view.path}
+            end={view.path === "/"}
             className={() =>
-              pathname === "/caixa/vendas" || pathname === "/" ? "active" : ""
+              currentPrototypeView(pathname, profile) === view.id
+                ? "active"
+                : ""
             }
+            onClick={() => setProfile(view.profile)}
           >
-            <Icon name="cash" />
-            <span>Vendas por unidade</span>
+            <Icon name={view.icon} />
+            <span>{view.name}</span>
           </NavLink>
-        ) : profile === "compras" ? (
-          <NavLink
-            to="/compras/cmv"
-            className={() =>
-              pathname === "/compras/cmv" || pathname === "/" ? "active" : ""
-            }
-          >
-            <Icon name="document" />
-            <span>Compras / CMV</span>
-          </NavLink>
-        ) : (
-          <>
-            <NavLink
-              to="/"
-              end
-              className={() =>
-                pathname === "/" ||
-                pathname.startsWith("/indicadores/") ||
-                pathname.startsWith("/lancamentos/")
-                  ? "active"
-                  : ""
-              }
-            >
-              <Icon name="home" />
-              <span>Visão geral</span>
-            </NavLink>
-            <NavLink to="/caixa/vendas">
-              <Icon name="cash" />
-              <span>Caixa</span>
-            </NavLink>
-          </>
-        )}
-        <NavLink to="/mais">
-          <Icon name="more" />
-          <span>Mais</span>
-        </NavLink>
+        ))}
       </nav>
     </div>
   );
