@@ -49,7 +49,9 @@ export default function Dashboard() {
     ),
   }));
   const max = Math.max(1, ...daily.map((d) => d.value));
-  const selected = daily.find((d) => d.date === params.get("dia"));
+  const selected =
+    daily.find((d) => d.date === params.get("dia")) ??
+    daily.filter((d) => d.date < today).at(-1);
   return (
     <>
       <h1>Visão geral</h1>
@@ -228,18 +230,6 @@ export default function Dashboard() {
           </Note>
         </>
       )}
-      <section className="panel cash-teaser">
-        <h2>O caixa, sem repetir contas</h2>
-        <p>
-          Informe os recebimentos por unidade e confira os descontos das taxas.
-        </p>
-        <Link className="primary" to="/caixa/vendas">
-          Informar recebimentos <Icon name="arrow" size={18} />
-        </Link>
-        <Link className="secondary unit-new" to="/simulacao">
-          Ver registros desta aba
-        </Link>
-      </section>
     </>
   );
 }
