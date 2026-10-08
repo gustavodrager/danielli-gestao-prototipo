@@ -55,7 +55,7 @@ export default function SpendingSummary({ month }: { month: string }) {
         className="summary-row staff-summary"
         to={`/compras/cmv?area=pessoal&equipe=freela&resumo=${month}`}
       >
-        <span>Freelas</span>
+        <span>Equipe Extra</span>
         <b>{format(totals.staffFreela)}</b>
       </Link>
       <p className="hint">

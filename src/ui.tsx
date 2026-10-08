@@ -193,9 +193,9 @@ export function Shell({ children }: { children: ReactNode }) {
           </span>
         </Link>
         <ViewMenu />
-        {simulation || !real ? (
+        {!simulation && !real ? (
           <Link className="demo-pill" to="/mais">
-            {simulation ? "SIMULAÇÃO" : "DADOS FICTÍCIOS"}
+            DADOS FICTÍCIOS
           </Link>
         ) : null}
       </header>

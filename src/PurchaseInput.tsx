@@ -232,7 +232,7 @@ function PurchaseForm() {
 
 const spendingAreas = [
   { id: "cmv", name: "Compras / CMV", description: "Alimentos e insumos" },
-  { id: "pessoal", name: "Pessoal", description: "Equipe fixa e freelas" },
+  { id: "pessoal", name: "Pessoal", description: "Equipe fixa e extra" },
   { id: "fixas", name: "Despesas fixas", description: "Gastos fixos gerais" },
   {
     id: "variaveis",
@@ -304,7 +304,7 @@ export default function PurchaseInput() {
                 aria-pressed={freela}
                 onClick={() => choose("equipe", "freela")}
               >
-                Freelas
+                Equipe Extra
               </button>
             </div>
           ) : null}

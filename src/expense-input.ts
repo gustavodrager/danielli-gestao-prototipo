@@ -5,7 +5,7 @@ export const expenseKinds = [
   { id: "fixed", name: "Despesas fixas", area: "fixas" },
   { id: "variable", name: "Despesas variáveis", area: "variaveis" },
   { id: "staff-fixed", name: "Equipe fixa", area: "pessoal" },
-  { id: "staff-freela", name: "Freelas", area: "pessoal" },
+  { id: "staff-freela", name: "Equipe Extra", area: "pessoal" },
 ] as const;
 export type ExpenseKind = (typeof expenseKinds)[number]["id"];
 export interface ExpenseDraft {

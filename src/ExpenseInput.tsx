@@ -42,7 +42,7 @@ export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
         {kind === "staff-fixed"
           ? "Informe o total da equipe no mês. Não é necessário cadastrar cada funcionário."
           : kind === "staff-freela"
-            ? "Informe o valor dos freelas. Você pode registrar um total ou detalhar cada pagamento."
+            ? "Informe o valor da equipe extra. Você pode registrar um total ou detalhar cada pagamento."
             : "Informe o valor conforme seus registros. Cada confirmação cria um lançamento; editar corrige o lançamento escolhido."}
       </p>
       {record ? (
@@ -184,7 +184,7 @@ export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
               {kind === "staff-fixed"
                 ? "Total da equipe fixa"
                 : kind === "staff-freela"
-                  ? "Valor dos freelas"
+                  ? "Valor da equipe extra"
                   : "Valor da despesa"}
             </span>
             <span className="currency-input">
@@ -195,7 +195,7 @@ export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
                   kind === "staff-fixed"
                     ? "Total da equipe fixa"
                     : kind === "staff-freela"
-                      ? "Valor dos freelas"
+                      ? "Valor da equipe extra"
                       : "Valor da despesa"
                 }
                 required
