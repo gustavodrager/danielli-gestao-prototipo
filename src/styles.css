@@ -2000,3 +2000,100 @@ summary {
   font-size: 13px;
   color: var(--muted);
 }
+
+/* Entradas gerais: uma escolha por vez, com rascunhos independentes. */
+.spending-areas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 20px 0 24px;
+}
+.spending-areas button,
+.staff-switch button {
+  min-height: 48px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+}
+.spending-areas button {
+  text-align: left;
+}
+.spending-areas b,
+.spending-areas small {
+  display: block;
+}
+.spending-areas b {
+  font-size: 14px;
+}
+.spending-areas small {
+  font-size: 12px;
+  margin-top: 4px;
+  color: var(--muted);
+}
+.spending-areas button.selected,
+.staff-switch button.selected {
+  background: var(--soft);
+  border-color: var(--gold-text);
+  box-shadow: inset 0 0 0 1px var(--gold-text);
+  color: var(--gold-text);
+}
+.staff-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.expense-details {
+  margin: 18px 0;
+}
+.expense-details > .text-field:first-of-type {
+  margin-top: 16px;
+}
+.expense-history {
+  margin-top: 24px;
+}
+.expense-history-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.expense-history-row span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.expense-history-row small {
+  display: block;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.expense-history-row span:last-child {
+  text-align: right;
+}
+.spending-period {
+  margin-top: 32px;
+}
+.spending-summary .summary-row {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.spending-summary .staff-summary {
+  padding-left: 16px;
+  font-size: 13px;
+}
+.spending-summary .row-link {
+  overflow-wrap: anywhere;
+}
+#expense-heading {
+  scroll-margin-top: 100px;
+}

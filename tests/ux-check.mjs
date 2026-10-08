@@ -268,7 +268,7 @@ try {
     await page.setViewportSize({ width, height: 844 });
     await clearOverflow();
   }
-  await menu("Compras (CMV) Entrada de compras gerais");
+  await menu("Compras (CMV) Compras, pessoal e despesas gerais");
   await page
     .getByRole("textbox", { name: "Total de compras", exact: true })
     .fill("23,45");

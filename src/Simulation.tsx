@@ -1,3 +1,4 @@
+import SpendingSummary from "./SpendingSummary";
 import { Link } from "./navigation";
 import { useDemo } from "./demo-context";
 import { dateLabel, money, units } from "./data";
@@ -161,6 +162,7 @@ export default function Simulation() {
           </Link>
         ))}
       </details>
+      <SpendingSummary month={month} />
       <section className="panel">
         <h2>Caixa e conferência</h2>
         {cashRecords

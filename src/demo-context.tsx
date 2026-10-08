@@ -25,6 +25,7 @@ import {
 import { type PrototypeProfile } from "./prototype-views";
 import { emptyPurchase, type PurchaseRecord } from "./purchase-input";
 import { useLocalState, upsertByDate } from "./local-state";
+import { emptyExpenseDrafts, type ExpenseRecord } from "./expense-input";
 function useDemoState() {
   const [params, setParams] = useSearchParams();
   const requested = params.get("mes") as Period | null;
@@ -103,6 +104,12 @@ function useDemoState() {
   const [cashRecords, setCashRecords, cashHistorySaved] = useLocalState<
     CashDraft[]
   >("cash-history", []);
+  const [expenseDrafts, setExpenseDrafts, expenseDraftsSaved] = useLocalState(
+    "expense-drafts",
+    emptyExpenseDrafts,
+  );
+  const [expenseRecords, setExpenseRecords, expenseRecordsSaved] =
+    useLocalState<ExpenseRecord[]>("expense-history", []);
   const setUnitSalesRecord = (unitSalesRecord: UnitSalesRecord | null) => {
     setUnitSalesRecordState(unitSalesRecord);
     if (!unitSalesRecord) return;
@@ -137,6 +144,10 @@ function useDemoState() {
       setPurchaseRecords((current) => upsertByDate(current, purchaseRecord));
   };
   return {
+    expenseDrafts,
+    setExpenseDrafts,
+    expenseRecords,
+    setExpenseRecords,
     feeRates,
     unitSalesRecords,
     setUnitSalesRecords,
@@ -145,6 +156,8 @@ function useDemoState() {
     cashRecords,
     setCashRecords,
     localSaved:
+      expenseDraftsSaved &&
+      expenseRecordsSaved &&
       ratesSaved &&
       feePresetSaved &&
       cashSaved &&

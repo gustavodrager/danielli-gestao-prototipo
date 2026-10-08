@@ -18,7 +18,7 @@ export const prototypeViews = [
   {
     id: "cmv",
     name: "Compras (CMV)",
-    description: "Entrada de compras gerais",
+    description: "Compras, pessoal e despesas gerais",
     path: "/compras/cmv",
     profile: "compras",
     icon: "document",

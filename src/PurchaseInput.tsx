@@ -1,3 +1,7 @@
+import { useSearchParams } from "react-router-dom";
+import ExpenseInput from "./ExpenseInput";
+import SpendingSummary from "./SpendingSummary";
+import { todayInSaoPaulo } from "./months";
 import { useEffect, useRef, useState } from "react";
 import { useDemo } from "./demo-context";
 import { dateLabel, money } from "./data";
@@ -9,14 +13,13 @@ import {
 import { Icon } from "./ui";
 import { Link } from "./navigation";
 
-export default function PurchaseInput() {
+function PurchaseForm() {
   const {
     purchaseDraft: draft,
     setPurchaseDraft: setDraft,
     purchaseRecord: record,
     setPurchaseRecord: setRecord,
     purchaseRecords: records,
-    localSaved,
   } = useDemo();
   const [errors, setErrors] = useState<ReturnType<typeof purchaseErrors>>([]);
   const errorRef = useRef<HTMLDivElement>(null);
@@ -30,9 +33,8 @@ export default function PurchaseInput() {
     if (record) confirmationRef.current?.focus();
   }, [record]);
   return (
-    <div className="unit-entry purchase-entry">
-      <span className="eyebrow">ENTRADA DE COMPRAS · DANIELLI</span>
-      <h1>Compras / CMV</h1>
+    <section aria-label="Entrada de compras">
+      <h2>Compras / CMV</h2>
       {record ? (
         <>
           <section
@@ -145,7 +147,9 @@ export default function PurchaseInput() {
                 }}
               />
             </label>
-            <label className={`amount-field ${invalid ? "invalid" : ""}`}>
+            <label
+              className={`payment-field amount-field ${invalid ? "invalid" : ""}`}
+            >
               <span>Total de compras</span>
               <span className="currency-input">
                 <span aria-hidden="true">R$</span>
@@ -157,7 +161,7 @@ export default function PurchaseInput() {
                   inputMode="decimal"
                   autoComplete="off"
                   value={draft.amount}
-                  placeholder="—"
+                  placeholder="Ex.: 1.420,00"
                   aria-invalid={invalid}
                   aria-describedby={
                     invalid ? "purchase-value-error" : undefined
@@ -201,9 +205,6 @@ export default function PurchaseInput() {
         Compras são uma aproximação do CMV. O CMV real depende dos estoques
         inicial e final. Valores gerais da Danielli, sem rateio por unidade.
       </p>
-      <Link className="secondary unit-new" to="/simulacao">
-        Ver registros nos indicadores da simulação
-      </Link>
       <details className="panel">
         <summary>Histórico local · {records.length} dias</summary>
         {records.map((r) => (
@@ -225,6 +226,120 @@ export default function PurchaseInput() {
           </button>
         ))}
       </details>
+    </section>
+  );
+}
+
+const spendingAreas = [
+  { id: "cmv", name: "Compras / CMV", description: "Alimentos e insumos" },
+  { id: "pessoal", name: "Pessoal", description: "Equipe fixa e freelas" },
+  { id: "fixas", name: "Despesas fixas", description: "Gastos fixos gerais" },
+  {
+    id: "variaveis",
+    name: "Despesas variáveis",
+    description: "Outros gastos variáveis",
+  },
+] as const;
+export default function PurchaseInput() {
+  const [params, setParams] = useSearchParams();
+  const area =
+    spendingAreas.find((a) => a.id === params.get("area"))?.id ?? "cmv";
+  const freela = params.get("equipe") === "freela";
+  const { localSaved } = useDemo();
+  const requestedMonth = params.get("resumo");
+  const month =
+    requestedMonth && /^\d{4}-(0[1-9]|1[0-2])$/.test(requestedMonth)
+      ? requestedMonth
+      : todayInSaoPaulo().slice(0, 7);
+  const choose = (field: string, value: string) =>
+    setParams((current) => {
+      const next = new URLSearchParams(current);
+      next.set(field, value);
+      return next;
+    });
+  return (
+    <div className="unit-entry purchase-entry">
+      <span className="eyebrow">ENTRADAS · DANIELLI</span>
+      <h1>Compras e despesas</h1>
+      <p>Escolha o que deseja informar.</p>
+      <div
+        className="spending-areas"
+        role="group"
+        aria-label="Tipo de lançamento"
+      >
+        {spendingAreas.map((a) => (
+          <button
+            type="button"
+            key={a.id}
+            className={area === a.id ? "selected" : ""}
+            aria-pressed={area === a.id}
+            onClick={() => choose("area", a.id)}
+          >
+            <b>{a.name}</b>
+            <small>{a.description}</small>
+          </button>
+        ))}
+      </div>
+      {area === "cmv" ? (
+        <PurchaseForm />
+      ) : (
+        <>
+          {area === "pessoal" ? (
+            <div
+              className="staff-switch"
+              role="group"
+              aria-label="Tipo de equipe"
+            >
+              <button
+                type="button"
+                className={!freela ? "selected" : ""}
+                aria-pressed={!freela}
+                onClick={() => choose("equipe", "fixa")}
+              >
+                Equipe fixa
+              </button>
+              <button
+                type="button"
+                className={freela ? "selected" : ""}
+                aria-pressed={freela}
+                onClick={() => choose("equipe", "freela")}
+              >
+                Freelas
+              </button>
+            </div>
+          ) : null}
+          <ExpenseInput
+            key={
+              area === "pessoal"
+                ? freela
+                  ? "staff-freela"
+                  : "staff-fixed"
+                : area
+            }
+            kind={
+              area === "pessoal"
+                ? freela
+                  ? "staff-freela"
+                  : "staff-fixed"
+                : area === "fixas"
+                  ? "fixed"
+                  : "variable"
+            }
+          />
+        </>
+      )}
+      <label className="text-field spending-period">
+        Mês do resumo
+        <input
+          type="month"
+          value={month}
+          onInput={(e) => choose("resumo", e.currentTarget.value)}
+        />
+      </label>
+      <SpendingSummary month={month} />
+      <Link className="secondary unit-new" to="/simulacao">
+        Ver todos os registros da simulação
+      </Link>
       <p className="unit-session-note">
         {localSaved
           ? "Simulação salva nesta aba · recuperável ao recarregar. Apague ao terminar em um dispositivo compartilhado."

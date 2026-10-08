@@ -14,6 +14,14 @@ import {
   purchaseAmount,
 } from "../src/purchase-input.ts";
 import {
+  emptyExpense,
+  expenseErrors,
+  expenseToDraft,
+  makeExpenseRecord,
+  upsertExpense,
+  expenseTotals,
+} from "../src/expense-input.ts";
+import {
   emptyUnitSales,
   unitSalesSummary,
   unitSalesErrors,
@@ -99,6 +107,72 @@ test("entrada de compras distingue ausência, zero, valor válido e inválido", 
   draft.amount = "100";
   draft.date = "2026-02-30";
   assert.ok(purchaseErrors(draft).some((e) => e.field === "purchase-date"));
+});
+test("despesas preservam ausência e zero, validam data e referência mensal", () => {
+  const draft = { ...emptyExpense(), date: "2026-10-07", month: "2026-09" };
+  assert.ok(expenseErrors(draft).length);
+  for (const amount of ["abc", "-1", "1,234", "R$"]) {
+    assert.throws(() =>
+      makeExpenseRecord({ ...draft, amount }, "fixed", "bad"),
+    );
+  }
+  assert.equal(
+    makeExpenseRecord({ ...draft, amount: "0,00" }, "fixed", "zero").amount,
+    0,
+  );
+  assert.ok(
+    expenseErrors({ ...draft, amount: "10", date: "2026-02-30" }).length,
+  );
+  assert.ok(expenseErrors({ ...draft, amount: "10", month: "2026-13" }).length);
+});
+test("lançamentos no mesmo dia coexistem; edição substitui somente o ID escolhido", () => {
+  const draft = {
+    ...emptyExpense(),
+    date: "2026-10-07",
+    month: "2026-10",
+    amount: "10,20",
+  };
+  const first = makeExpenseRecord(draft, "staff-freela", "first");
+  const second = makeExpenseRecord(draft, "staff-freela", "second");
+  const records = upsertExpense(upsertExpense([], first), second);
+  assert.equal(records.length, 2);
+  const edited = makeExpenseRecord(
+    { ...expenseToDraft(first), amount: "20,35" },
+    "staff-freela",
+    "unused",
+  );
+  const updated = upsertExpense(records, edited);
+  assert.equal(updated.length, 2);
+  assert.equal(updated.find((r) => r.id === "first")!.amount, 2035);
+  assert.equal(updated.find((r) => r.id === "second")!.amount, 1020);
+});
+test("resumo separa pessoal das despesas e usa o mês informado, sem presumir cobertura", () => {
+  const draft = {
+    ...emptyExpense(),
+    date: "2026-10-07",
+    month: "2026-09",
+    amount: "100,10",
+  };
+  const records = [
+    makeExpenseRecord(draft, "staff-fixed", "a"),
+    makeExpenseRecord({ ...draft, amount: "20,20" }, "staff-freela", "b"),
+    makeExpenseRecord({ ...draft, amount: "0" }, "fixed", "c"),
+  ];
+  assert.deepEqual(expenseTotals(records, "2026-09"), {
+    fixed: 0,
+    variable: null,
+    staffFixed: 10010,
+    staffFreela: 2020,
+    staff: 12030,
+  });
+  assert.deepEqual(expenseTotals(records, "2026-10"), {
+    fixed: null,
+    variable: null,
+    staffFixed: null,
+    staffFreela: null,
+    staff: null,
+  });
+  assert.equal(records[0].date, "2026-10-07");
 });
 test("entrada simples soma centavos e preserva unidades não informadas", () => {
   const draft = emptyUnitSales();
