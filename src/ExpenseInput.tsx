@@ -81,7 +81,7 @@ export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
               </div>
               {record.reference ? (
                 <div>
-                  <dt>Observação</dt>
+                  <dt>Descrição do valor informado</dt>
                   <dd className="preserve-lines">{record.reference}</dd>
                 </div>
               ) : null}
@@ -212,6 +212,29 @@ export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
             Campo vazio significa não informado. Zero deve ser digitado
             explicitamente.
           </p>
+          <label className="text-field">
+            Descrição do valor informado <small>Opcional</small>
+            <textarea
+              id="expense-description"
+              rows={2}
+              value={draft.reference}
+              aria-describedby="expense-description-help"
+              placeholder={
+                kind === "staff-fixed"
+                  ? "Ex.: salários da equipe fixa no mês"
+                  : kind === "staff-freela"
+                    ? "Ex.: equipe extra do almoço de sábado"
+                    : kind === "fixed"
+                      ? "Ex.: aluguel do restaurante"
+                      : "Ex.: comissão de delivery do período"
+              }
+              onChange={(e) => update({ reference: e.target.value })}
+            />
+          </label>
+          <p className="hint" id="expense-description-help">
+            Descreva o que este valor reúne. Pode ser um gasto, um grupo de
+            despesas ou um pagamento da equipe.
+          </p>
           <details
             ref={details}
             className="panel expense-details"
@@ -244,19 +267,6 @@ export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
                     : "Ex.: aluguel, contabilidade ou comissão"
                 }
                 onChange={(e) => update({ category: e.target.value })}
-              />
-            </label>
-            <label className="text-field">
-              Observação <small>Opcional</small>
-              <textarea
-                rows={2}
-                value={draft.reference}
-                placeholder={
-                  isStaff
-                    ? "Descreva o que está incluído no total, se souber"
-                    : "Referência do registro ou observação"
-                }
-                onChange={(e) => update({ reference: e.target.value })}
               />
             </label>
           </details>
@@ -304,6 +314,9 @@ export default function ExpenseInput({ kind }: { kind: ExpenseKind }) {
             >
               <span>
                 <b>{r.category || name}</b>
+                {r.reference ? (
+                  <small className="preserve-lines">{r.reference}</small>
+                ) : null}
                 <small>
                   {dateLabel(r.date)} · Ref.{" "}
                   {r.month.split("-").reverse().join("/")}

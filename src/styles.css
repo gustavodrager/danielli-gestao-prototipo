@@ -2085,3 +2085,16 @@ summary {
 #expense-heading {
   scroll-margin-top: 100px;
 }
+
+.record-description {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+.described-record {
+  display: block;
+  text-align: left;
+}

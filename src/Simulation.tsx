@@ -158,7 +158,7 @@ export default function Simulation() {
             }}
           >
             {dateLabel(r.date)} · {money(r.amount / 100)} ·{" "}
-            {r.reference || "Sem referência"} · Editar
+            {r.reference || "Sem descrição"} · Editar
           </Link>
         ))}
       </details>

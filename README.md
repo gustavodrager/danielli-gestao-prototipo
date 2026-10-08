@@ -117,3 +117,7 @@ Validação desta mudança: build e 18 testes de modelo aprovados; revisão no n
 ## Navegação sempre visível — 08/10/2026
 
 O menu inferior fica fixo em todas as visões, inclusive nas entradas operacionais, com espaço ao final da página e na rolagem de foco para proteger campos e ações. Menu superior e inferior usam os mesmos nomes: Visão geral, Entradas (antes Caixa) e Despesas (antes Compras/CMV). Rotas, perfis e registros existentes continuam compatíveis.
+
+## Descrição dos valores — 08/10/2026
+
+As quatro opções da página Despesas mostram o campo opcional “Descrição do valor informado” junto ao valor, com exemplos por tipo de entrada. O texto aparece na confirmação, no histórico e nos lançamentos do resumo mensal. A descrição utiliza o campo de referência/observação já existente, preservando registros anteriores, rascunhos e edição. Não cria novas categorias nem altera cálculos.

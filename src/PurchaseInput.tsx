@@ -58,7 +58,7 @@ function PurchaseForm() {
               </div>
               {record.reference ? (
                 <div>
-                  <dt>Referência / observação</dt>
+                  <dt>Descrição do valor informado</dt>
                   <dd className="preserve-lines">{record.reference}</dd>
                 </div>
               ) : null}
@@ -184,17 +184,23 @@ function PurchaseForm() {
               informado.
             </p>
             <label className="text-field">
-              Referência / observação <small>Opcional</small>
+              Descrição do valor informado <small>Opcional</small>
               <textarea
                 rows={2}
                 value={draft.reference}
-                placeholder="Livro, planilha ou observação da compra"
+                id="purchase-description"
+                aria-describedby="purchase-description-help"
+                placeholder="Ex.: compras de alimentos e bebidas do dia"
                 onChange={(event) => {
                   const reference = event.target.value;
                   setDraft((current) => ({ ...current, reference }));
                 }}
               />
             </label>
+            <p className="hint" id="purchase-description-help">
+              Descreva o que está incluído neste total. Você também pode indicar
+              o livro, a nota ou a planilha de referência.
+            </p>
             <button className="primary" type="submit">
               Confirmar compras <Icon name="check" size={18} />
             </button>
@@ -210,7 +216,7 @@ function PurchaseForm() {
         {records.map((r) => (
           <button
             type="button"
-            className="secondary unit-new"
+            className="secondary unit-new described-record"
             key={r.date}
             onClick={() => {
               setRecord(null);
@@ -222,7 +228,14 @@ function PurchaseForm() {
               });
             }}
           >
-            Editar {dateLabel(r.date)}
+            <span>
+              Editar {dateLabel(r.date)} · {money(r.amount / 100)}
+            </span>
+            {r.reference ? (
+              <small className="record-description preserve-lines">
+                {r.reference}
+              </small>
+            ) : null}
           </button>
         ))}
       </details>

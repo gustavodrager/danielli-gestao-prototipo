@@ -73,7 +73,7 @@ export default function SpendingSummary({ month }: { month: string }) {
             return (
               <Link
                 key={r.id}
-                className="row-link"
+                className="row-link described-record"
                 to={`/compras/cmv?area=${kind.area}&resumo=${month}${r.kind === "staff-freela" ? "&equipe=freela" : ""}`}
                 onClick={() =>
                   setExpenseDrafts((current) => ({
@@ -82,8 +82,19 @@ export default function SpendingSummary({ month }: { month: string }) {
                   }))
                 }
               >
-                {kind.name} · {r.category || "Sem detalhamento"} ·{" "}
-                {money(r.amount / 100)} · Editar
+                <span>
+                  {kind.name} ·{" "}
+                  {r.category ||
+                    (r.kind.startsWith("staff-")
+                      ? "Total da equipe"
+                      : "A classificar")}{" "}
+                  · {money(r.amount / 100)} · Editar
+                </span>
+                {r.reference ? (
+                  <small className="record-description preserve-lines">
+                    {r.reference}
+                  </small>
+                ) : null}
               </Link>
             );
           })
