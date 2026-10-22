@@ -1,4 +1,4 @@
-import { cents } from "./data.ts";
+import { cents } from "./domain.ts";
 
 export interface PurchaseDraft {
   date: string;

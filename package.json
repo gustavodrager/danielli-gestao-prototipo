@@ -1,27 +1,42 @@
 {
-  "name": "danielli-gestao-prototipo",
+  "name": "danielli-gestao",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc --noEmit -p tsconfig.app.json && vite build",
+    "dev": "node --env-file-if-exists=.env.local --experimental-strip-types scripts/dev.ts",
+    "build": "npm run typecheck && vite build && node scripts/check-public-bundle.mjs",
     "preview": "vite preview",
-    "test": "node --experimental-strip-types --test tests/model.test.ts",
-    "test:ui": "node tests/ux-check.mjs",
-    "test:ui:legacy": "node tests/ui-check.mjs"
+    "test": "node --env-file-if-exists=.env.test.local --experimental-strip-types --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.server.json",
+    "test:integration": "node --env-file-if-exists=.env.test.local --experimental-strip-types scripts/test-integration.ts",
+    "db:migrate": "node --env-file-if-exists=.env.local --experimental-strip-types scripts/migrate.ts",
+    "db:bootstrap": "node --env-file-if-exists=.env.local --experimental-strip-types scripts/bootstrap.ts",
+    "db:import-july": "node --env-file-if-exists=.env.local --experimental-strip-types scripts/import-july.ts",
+    "db:backup": "node --env-file-if-exists=.env.local --experimental-strip-types scripts/backup.ts",
+    "db:restore-check": "node --env-file-if-exists=.env.local --experimental-strip-types scripts/restore-check.ts",
+    "test:ui:prototype": "node tests/ux-check.mjs",
+    "test:ui:prototype-legacy": "node tests/ui-check.mjs"
   },
   "dependencies": {
+    "@vercel/functions": "^3.10.3",
+    "pg": "^8.23.1",
     "react": "latest",
     "react-dom": "latest",
-    "react-router-dom": "latest"
+    "react-router-dom": "latest",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/pg": "^8.23.1",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "@vitejs/plugin-react": "latest",
     "playwright": "^1.63.0",
     "typescript": "latest",
     "vite": "latest"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }

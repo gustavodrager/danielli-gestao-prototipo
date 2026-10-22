@@ -1,4 +1,4 @@
-import { cents, units } from "./data.ts";
+import { cents, units } from "./domain.ts";
 import { todayInSaoPaulo } from "./months.ts";
 export type UnitId = (typeof units)[number]["id"];
 export const paymentMethods = [
@@ -106,7 +106,7 @@ export function recordToDraft(record: UnitSalesRecord): UnitSalesDraft {
       u.id,
       record.values[u.id] == null
         ? ""
-        : (record.values[u.id]! / 100).toFixed(2),
+        : (record.values[u.id]! / 100).toFixed(2).replace(".", ","),
     ]),
   ) as UnitSalesDraft["values"];
   if (record.receipts)
@@ -118,7 +118,9 @@ export function recordToDraft(record: UnitSalesRecord): UnitSalesDraft {
             m.id,
             record.receipts![u.id][m.id] == null
               ? ""
-              : (record.receipts![u.id][m.id]! / 100).toFixed(2),
+              : (record.receipts![u.id][m.id]! / 100)
+                  .toFixed(2)
+                  .replace(".", ","),
           ]),
         ),
       ]),

@@ -428,7 +428,7 @@ test("registros antigos mantêm seus totais sem distribuição e taxas ficam con
     date: legacy.date,
     values: recordToDraft(legacy).values,
   });
-  assert.equal(migrated.values.balcao, "100.00");
+  assert.equal(migrated.values.balcao, "100,00");
   assert.equal(migrated.receipts!.balcao.debito, "");
   assert.equal(legacy.total, 10000);
   assert.equal(sharedReceipts(legacy), null);
@@ -455,6 +455,7 @@ test("registros antigos mantêm seus totais sem distribuição e taxas ficam con
   assert.equal(saved.rates!.debito, 150);
   assert.equal(saved.partialNet, 9850);
   assert.equal(recordToDraft(saved).rates!.debito, "1,50");
+  assert.equal(recordToDraft(saved).receipts!.balcao.debito, "100,00");
   assert.equal(sharedReceipts(saved)!.debito, null); // As cinco unidades ausentes não viram zero.
   for (const u of units)
     d.receipts![u.id] = { debito: "1", credito: "0", dinheiro: "0", pix: "0" };

@@ -3,3 +3,8 @@ dist/
 .vercel/
 artifacts/
 *.local
+
+.env
+.env.*
+!.env.example
+backups/
