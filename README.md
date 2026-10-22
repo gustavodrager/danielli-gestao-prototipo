@@ -6,7 +6,7 @@ O piloto contempla **login, usuários, Entradas, revisões e dashboard autentica
 
 ## Ambiente único
 
-Repositório: [gustavodrager/danielli-gestao-prototipo](https://github.com/gustavodrager/danielli-gestao-prototipo). Projeto Vercel existente: `danielli-gestao-prototipo`, ID `prj_BNKtgmQNBAUeqOm3Z3RnY0lZxuse`. Domínio principal: [danielli.parsero.co](https://danielli.parsero.co). Sem ZIPs, outro repositório ou outro projeto Vercel.
+Repositório: [gustavodrager/danielli-gestao-prototipo](https://github.com/gustavodrager/danielli-gestao-prototipo). Projeto Vercel existente: `danielli-gestao-prototipo`, ID `prj_BNKtgmQNBAUeqOm3Z3RnY0lZxuse`. Endereço ativo: [Danielli Gestão](https://danielli-gestao-prototipo-seven.vercel.app). O domínio pretendido `danielli.parsero.co` está associado na Vercel, mas ainda depende do CNAME na Cloudflare (NXDOMAIN verificado em 22/10/2026). Sem ZIPs, outro repositório ou outro projeto Vercel.
 
 **Infraestrutura preparada em 22/10/2026:** bancos Neon independentes `danielli-producao` e `danielli-homologacao`, plano Free, região São Paulo; cada ambiente recebe sua conexão privada na Vercel. API em `gru1`, próxima ao banco. Uma prévia sem `DATABASE_URL` mostra indisponibilidade e não aceita lançamentos. Não há fallback para dados fictícios ou para o armazenamento antigo do protótipo.
 

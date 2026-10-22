@@ -50,3 +50,13 @@ Em aparelho compartilhado, usar contas individuais e sair ao terminar. Os rascun
 - Contas reais, teste em aparelho físico com Higor/operador e acompanhamento de uma semana ainda dependem da entrada no piloto.
 
 Infraestrutura criada: produção Neon `icy-river-31288539`; homologação Neon `dry-mud-23564824`, organização Parsero (Free), São Paulo, PostgreSQL 17, compute 0,25 CU. URLs de conexão ficam privadas. A recuperação instantânea do plano tem janela curta de seis horas; o backup externo recorrente e sua retenção ainda precisam ser definidos antes da semana operacional. Para libpq/pg_dump com `verify-full`, pode ser necessário indicar `sslrootcert` explicitamente conforme o sistema.
+
+## Publicação e primeiro acesso
+
+A base foi publicada por meio do PR #1 no projeto Vercel existente. Build e CI passaram em Node 24. O fluxo operador → confirmação → gestor → dashboard foi validado por HTTPS na prévia, com dados artificiais apenas no banco de homologação: R$ 650,00 bruto, R$ 14,00 taxas e R$ 636,00 líquido parcial, com 1/6 unidades completas.
+
+Produção: `/api/health` responde 200 com status ok; dashboard sem sessão responde 401. Foram conferidos 31 registros de julho, zero vendas e apenas o primeiro gestor `gustavo`, criado após escolha explícita do titular e aguardando definição da senha. O link temporário é privado, de uso único; não registrar aqui nem no Git.
+
+O endereço ativo é https://danielli-gestao-prototipo-seven.vercel.app. O endereço `danielli.parsero.co` está associado e verificado na Vercel, mas o DNS autoritativo da Cloudflare retorna NXDOMAIN. A configuração recomendada pela Vercel para este domínio é **CNAME**, nome **danielli**, destino **cname.vercel-dns.com**, inicialmente **somente DNS**. O registro deve ser criado na zona `parsero.co` da Cloudflare; não alterar MX, TXT ou nameservers. Revalidar DNS/HTTPS após criá-lo. Não foi criada uma conexão Cloudflare nem alterada a zona nesta entrega. Até isso ser resolvido, emitir links de ativação pelo endereço ativo da Vercel.
+
+A ativação do gestor pelo próprio titular, cadastro do operador, teste físico e piloto acompanhado continuam como próximos passos.
